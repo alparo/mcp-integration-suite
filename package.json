@@ -1,0 +1,28 @@
+{
+    "name": "mcp-integration-suite",
+    "version": "1.0.0",
+    "description": "MCP Server für Integration Package Management",
+    "main": "dist/server.js",
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "start": "node dist/server.js",
+        "dev": "ts-node-dev --esm src/server.ts",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.8.0",
+        "@sap-cloud-sdk/connectivity": "^3.26.4",
+        "@sap-cloud-sdk/http-client": "^3.26.4",
+        "@sap-cloud-sdk/odata-v2": "^3.26.4",
+        "@sap-cloud-sdk/test-util": "^3.26.4",
+        "dotenv": "^16.4.7",
+        "unzipper": "^0.12.3",
+        "zod": "^3.20.0"
+    },
+    "devDependencies": {
+        "@sap-cloud-sdk/generator": "^3.26.4",
+        "@types/node": "^18.15.0",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.0.0"
+    }
+}

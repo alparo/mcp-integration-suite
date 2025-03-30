@@ -17,7 +17,7 @@ let tokenCache: {
 	expiresAt: number;
 } | null = null;
 
-const getOAuthToken = async (): Promise<DestinationAuthToken> => {
+export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 	// Prüfen, ob ein gültiges Token im Cache ist (mit 5 Minuten Puffer)
 	const now = Date.now();
 	if (tokenCache && tokenCache.expiresAt > now + 5 * 60 * 1000) {

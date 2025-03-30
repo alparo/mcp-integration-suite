@@ -1,3 +1,4 @@
+import { getIflow } from "./api/iflow/serialize";
 import { createPackage } from "./api/packages";
 
-createPackage('testpkg').then(console.log)
+getIflow().then(console.log)

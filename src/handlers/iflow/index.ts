@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
 import { createIflow, deployIflow, getIflow, updateIflow } from "../../api/iflow";
+import { logInfo } from "../..";
 
 export const updateIflowFiles = z.array(
 	z.object({
@@ -92,8 +93,9 @@ export const registerIflowHandlers = (server: McpServer) => {
 		async ({ id, files, autoDeploy }) => {
 			try {
                 const result = await updateIflow(id, files);
-
+                logInfo("Iflow updated successfully");
                 if (autoDeploy) {
+                    logInfo("auto deploy is activated");
                     await deployIflow(id);
                 }
 

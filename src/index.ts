@@ -26,3 +26,11 @@ main().catch((error) => {
 	console.error("Fatal error in main():", error);
 	process.exit(1);
 });
+
+export const logError = (msg: string): void => {
+	server.server.sendLoggingMessage({level: "error", data: msg});
+}
+
+export const logInfo = (msg: string): void => {
+	server.server.sendLoggingMessage({level: "info", data: msg});
+}

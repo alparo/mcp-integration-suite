@@ -4,7 +4,7 @@ import {
 	retrieveJwt,
 	DestinationAuthToken,
 } from "@sap-cloud-sdk/connectivity";
-import "dotenv/config";
+
 
 
 // Cache für das Token

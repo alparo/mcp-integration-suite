@@ -1,12 +1,15 @@
 import { integrationContent } from "../../generated/IntegrationContent/service";
 import { getUnzipperInstance, parseZip, patchFile } from "../../utils/zip";
 import { getCurrentDestionation, getOAuthToken } from "../destination";
-import { updateIflowFiles } from "../../handlers/iflow";
+import { updateIflowFiles } from "../../handlers/iflow/tools";
 import unzipper from "unzipper";
 import yazl from "yazl";
 import fs from "fs";
 import { z } from "zod";
-import { DeployIntegrationAdapterDesigntimeArtifactParameters, deployIntegrationDesigntimeArtifact } from "../../generated/IntegrationContent";
+import {
+	DeployIntegrationAdapterDesigntimeArtifactParameters,
+	deployIntegrationDesigntimeArtifact,
+} from "../../generated/IntegrationContent";
 const {
 	messageMappingDesigntimeArtifactsApi,
 	integrationDesigntimeArtifactsApi,
@@ -106,16 +109,15 @@ export const updateIflow = async (
 	// Sorry
 	currentIflow.artifactContent = iflowBuffer as unknown as string;
 
-
 	await integrationDesigntimeArtifactsApi
 		.requestBuilder()
 		.update(currentIflow)
 		.execute(await getCurrentDestionation());
 };
 
-export const deployIflow = async(id: string) => {
+export const deployIflow = async (id: string) => {
 	await deployIntegrationDesigntimeArtifact({
 		id,
-		version: "active"
+		version: "active",
 	}).execute(await getCurrentDestionation());
 };

@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
-import { createIflow, deployIflow, getIflow, updateIflow } from "../../api/iflow";
-import { logInfo } from "../..";
+import { createIflow, deployIflow, getIflow, saveAsNewVersion, updateIflow } from "../../api/iflow";
+import { logError, logInfo } from "../..";
 
 export const updateIflowFiles = z.array(
 	z.object({
@@ -22,11 +22,13 @@ export const registerIflowHandlers = (server: McpServer) => {
 			id: z.string().describe("ID of the IFLOW"),
 		},
 		async ({ id }) => {
+			logInfo(`trying to get iflow ${id}`);
 			try {
 				return {
 					content: [{ type: "text", text: await getIflow(id) }],
 				};
 			} catch (error) {
+				logError(error);
 				return {
 					content: [
 						{
@@ -59,6 +61,7 @@ export const registerIflowHandlers = (server: McpServer) => {
 					],
 				};
 			} catch (error) {
+				logError(error);
 				return {
 					content: [
 						{
@@ -75,6 +78,7 @@ export const registerIflowHandlers = (server: McpServer) => {
 	server.tool(
 		"update-iflow",
 		`Update or create files/content of an iflow
+		You only have to provide files that need to be updated
         Folder structure is like this:
         src/main/resources/ is the root
         src/mainresources/mapping contains message mappings in format <mappingname>.mmap with xml structure
@@ -91,11 +95,14 @@ export const registerIflowHandlers = (server: McpServer) => {
 				),
 		},
 		async ({ id, files, autoDeploy }) => {
+			logInfo(`Updating iflow ${id} autodeploy: ${autoDeploy}`);
+			logInfo(files);
 			try {
-                const result = await updateIflow(id, files);
+                await updateIflow(id, files);
                 logInfo("Iflow updated successfully");
                 if (autoDeploy) {
                     logInfo("auto deploy is activated");
+					await saveAsNewVersion(id);
                     await deployIflow(id);
                 }
 
@@ -108,11 +115,12 @@ export const registerIflowHandlers = (server: McpServer) => {
 					],
 				};
 			} catch (error) {
+				logError(error);
 				return {
 					content: [
 						{
 							type: "text",
-							text: `Error: ${error}`,
+							text: `Error: Could not update`,
 						},
 					],
 					isError: true,

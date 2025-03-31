@@ -3,11 +3,22 @@
     "version": "1.0.0",
     "description": "MCP Server für Integration Package Management",
     "main": "dist/server.js",
+    "watch": {
+        "dev": {
+            "patterns": [
+                "src"
+            ],
+            "extensions": "ts"
+        }
+    },
     "scripts": {
         "build": "tsc -p tsconfig.json",
         "start": "node dist/server.js",
-        "dev": "ts-node-dev --esm src/server.ts",
-        "test": "npm run build && node dist/test.js"
+        "dev": "npm run build && npm run dev:inspector",
+        "dev:inspector": "npx @modelcontextprotocol/inspector node",
+        "test": "npm run build && node dist/test.js",
+        "watch": "npm-watch dev",
+        "watch:log": "tail -n 20 -F ~/Library/Logs/Claude/mcp-server-mcp-integration-suite.log"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.8.0",
@@ -16,6 +27,9 @@
         "@sap-cloud-sdk/odata-v2": "^3.26.4",
         "@sap-cloud-sdk/test-util": "^3.26.4",
         "dotenv": "^16.4.7",
+        "glob": "^11.0.1",
+        "mcps-logger": "^1.0.0-rc.4",
+        "semver": "^7.7.1",
         "unzipper": "^0.12.3",
         "yazl": "^3.3.1",
         "zod": "^3.20.0"
@@ -23,8 +37,10 @@
     "devDependencies": {
         "@sap-cloud-sdk/generator": "^3.26.4",
         "@types/node": "^18.15.0",
+        "@types/semver": "^7.7.0",
         "@types/unzipper": "^0.10.11",
         "@types/yazl": "^2.4.6",
+        "npm-watch": "^0.13.0",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.0.0"
     }

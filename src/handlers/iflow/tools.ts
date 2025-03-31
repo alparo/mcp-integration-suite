@@ -76,10 +76,10 @@ export const registerIflowHandlers = (server: McpServer) => {
 		"update-iflow",
 		`Update or create files/content of an iflow
         Folder structure is like this:
-        resources/ is the root
-        resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
-        resources/scripts contains groovy and javascript scripts that can be used within iflow
-        resources/scenarioflows/integrationflow/<iflow id>.iflw contains the iflow in xml structure
+        src/main/resources/ is the root
+        src/mainresources/mapping contains message mappings in format <mappingname>.mmap with xml structure
+        src/mainresources/scripts contains groovy and javascript scripts that can be used within iflow
+        src/mainresources/scenarioflows/integrationflow/<iflow id>.iflw contains the iflow in xml structure
         `,
 		{
 			id: z.string().describe("ID of the IFLOW"),

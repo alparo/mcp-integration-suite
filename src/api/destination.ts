@@ -1,7 +1,4 @@
-import {
-	setTestDestination,
-	getTestDestinationByAlias,
-} from "@sap-cloud-sdk/test-util";
+
 import {
 	HttpDestinationOrFetchOptions,
 	retrieveJwt,
@@ -9,7 +6,6 @@ import {
 } from "@sap-cloud-sdk/connectivity";
 import "dotenv/config";
 
-const destName = "TESTINATION";
 
 // Cache für das Token
 let tokenCache: {

@@ -6,6 +6,7 @@ import unzipper from "unzipper";
 import yazl from "yazl";
 import fs from "fs";
 import { z } from "zod";
+import { DeployIntegrationAdapterDesigntimeArtifactParameters, deployIntegrationDesigntimeArtifact } from "../../generated/IntegrationContent";
 const {
 	messageMappingDesigntimeArtifactsApi,
 	integrationDesigntimeArtifactsApi,
@@ -106,8 +107,15 @@ export const updateIflow = async (
 	currentIflow.artifactContent = iflowBuffer as unknown as string;
 
 
-	return integrationDesigntimeArtifactsApi
+	await integrationDesigntimeArtifactsApi
 		.requestBuilder()
 		.update(currentIflow)
 		.execute(await getCurrentDestionation());
+};
+
+export const deployIflow = async(id: string) => {
+	await deployIntegrationDesigntimeArtifact({
+		id,
+		version: "active"
+	}).execute(await getCurrentDestionation());
 };

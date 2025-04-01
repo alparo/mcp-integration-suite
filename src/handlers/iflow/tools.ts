@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
-import { createIflow, deployIflow, getIflow, saveAsNewVersion, updateIflow } from "../../api/iflow";
+import { createIflow, deployIflow, getIflowContentString, saveAsNewVersion, updateIflow } from "../../api/iflow";
 import { logError, logInfo } from "../..";
 
 export const updateIflowFiles = z.array(
@@ -26,7 +26,7 @@ Some ressources might relay on other package artefacts which are not included bu
 		async ({ id }) => {
 			logInfo(`trying to get iflow ${id}`);
 			try {
-				const fileContent = await getIflow(id);
+				const fileContent = await getIflowContentString(id);
 				//const escapedFileContent = escapeDoublequotes(fileContent);
 				
 				return {

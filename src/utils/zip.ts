@@ -1,33 +1,28 @@
-import unzipper from "unzipper";
-import { ZipFile } from "yazl";
-
-export const parseZip = async (unzipArchive: unzipper.CentralDirectory) => {
-	let resultString = "";
-
-	for (const file of unzipArchive.files) {
-		if (!file.isUnicode) continue;
-
-		resultString += file.path + "\n---begin-of-file---\n";
-
-		try {
-			const fileBuf = await file.buffer();
-			resultString += fileBuf.toString() + "\n---end-of-file---\n\n";
-		} catch {
-			continue;
-		}
-	}
-
-	return resultString;
-};
-
-export const getUnzipperInstance = async (rawZip: Buffer) =>
-	unzipper.Open.buffer(rawZip);
+import { mkdtemp, writeFile } from "node:fs/promises";
+import { projPath } from "..";
+import AdmZip from 'adm-zip';
+import path from "node:path";
 
 export const patchFile = async (
-	zip: ZipFile,
 	filepath: string,
 	content: string
-): Promise<ZipFile> => {
-	zip.addBuffer(Buffer.from(content), filepath)
-	return zip;
+): Promise<void> => {
+	await writeFile(filepath, content);
+	return;
+};
+
+export const extractToFolder = async(zipBuf: Buffer, id: string): Promise<string>  => {
+	const iflowPath = path.join(projPath, 'temp', id);
+	await mkdtemp(iflowPath);
+
+	const zip = new AdmZip(zipBuf);
+	zip.extractAllTo(iflowPath, true);
+
+	return iflowPath;
+};
+
+export const folderToZipBuffer = (path: string): Buffer => {
+	const zip = new AdmZip(path);
+	return zip.toBuffer();
+
 };

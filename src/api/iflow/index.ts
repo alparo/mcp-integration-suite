@@ -68,12 +68,12 @@ export const updateIflow = async (
 
 	for (const file of iflowFiles) {
 		await logExecutionTimeOfAsyncFunc(
-			patchFile(file.filepath, file.content),
+			patchFile(iflowPath, file.filepath, file.content),
 			`Patch file ${file.filepath}`
 		);
 	}
 
-	const iflowBuffer = folderToZipBuffer(iflowPath);
+	const iflowBuffer = await folderToZipBuffer(iflowPath);
 
 	const currentIflow = await logExecutionTimeOfAsyncFunc(
 		integrationDesigntimeArtifactsApi

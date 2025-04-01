@@ -4,14 +4,16 @@ import { getCurrentDestionation, getOAuthToken } from "../destination";
 import { updateIflowFiles } from "../../handlers/iflow/tools";
 import unzipper from "unzipper";
 import yazl from "yazl";
-import fs from "fs";
 import { z } from "zod";
+import semver from "semver";
 import {
 	DeployIntegrationAdapterDesigntimeArtifactParameters,
 	deployIntegrationDesigntimeArtifact,
+	integrationDesigntimeArtifactSaveAsVersion,
 } from "../../generated/IntegrationContent";
+import { logInfo } from "../..";
+import { logExecutionTimeOfAsyncFunc } from "../../utils/performanceTrace";
 const {
-	messageMappingDesigntimeArtifactsApi,
 	integrationDesigntimeArtifactsApi,
 } = integrationContent();
 
@@ -29,11 +31,14 @@ const unzipperToYazl = async (
 };
 
 const getIflowZip = async (id: string): Promise<unzipper.CentralDirectory> => {
-	const iflowUrl = await integrationDesigntimeArtifactsApi
-		.requestBuilder()
-		.getByKey(id, "active")
-		.appendPath("/$value")
-		.url(await getCurrentDestionation());
+	const iflowUrl = await logExecutionTimeOfAsyncFunc(
+		integrationDesigntimeArtifactsApi
+			.requestBuilder()
+			.getByKey(id, "active")
+			.appendPath("/$value")
+			.url(await getCurrentDestionation()),
+		"get Iflow zip"
+	);
 
 	const authHeader = (await getOAuthToken()).http_header;
 
@@ -77,11 +82,11 @@ export const createIflow = async (
 const yazlToBuf = async (
 	yazlZip: yazl.ZipFile
 ): Promise<Buffer<ArrayBufferLike>> => {
-	return new Promise((resulve, reject) => {
+	return new Promise((resolve, reject) => {
 		const chunks: Uint8Array[] = [];
 
 		yazlZip.outputStream.on("data", (chunk) => chunks.push(chunk));
-		yazlZip.outputStream.on("end", () => resulve(Buffer.concat(chunks)));
+		yazlZip.outputStream.on("end", () => resolve(Buffer.concat(chunks)));
 		yazlZip.outputStream.on("error", reject);
 	});
 };
@@ -90,29 +95,66 @@ export const updateIflow = async (
 	id: string,
 	iflowFiles: z.infer<typeof updateIflowFiles>
 ) => {
-	const unzipperInstance = await getIflowZip(id);
-	console.log("noch alles gut");
-	const yazlZip = await unzipperToYazl(unzipperInstance);
+	const unzipperInstance = await logExecutionTimeOfAsyncFunc(
+		getIflowZip(id),
+		"get iflow zip"
+	);
+	const yazlZip = await logExecutionTimeOfAsyncFunc(
+		unzipperToYazl(unzipperInstance),
+		"unzipper to yazl"
+	);
 
 	for (const file of iflowFiles) {
-		await patchFile(yazlZip, file.filepath, file.content);
+		await logExecutionTimeOfAsyncFunc(
+			patchFile(yazlZip, file.filepath, file.content),
+			`Patch file ${file.filepath}`
+		);
 	}
 
-	yazlZip.end();
-	const iflowBuffer = await yazlToBuf(yazlZip);
+	const iflowBuffer = await logExecutionTimeOfAsyncFunc(
+		yazlToBuf(yazlZip),
+		"yazl to buf"
+	);
 
+	const currentIflow = await logExecutionTimeOfAsyncFunc(
+		integrationDesigntimeArtifactsApi
+			.requestBuilder()
+			.getByKey(id, "active")
+			.execute(await getCurrentDestionation()),
+		"get current iflow"
+	);
+
+	// Sorry
+	currentIflow.artifactContent = iflowBuffer as unknown as string;
+
+	const res = await logExecutionTimeOfAsyncFunc(
+		integrationDesigntimeArtifactsApi
+			.requestBuilder()
+			.update(currentIflow)
+			.execute(await getCurrentDestionation()),
+		"Update iflow"
+	);
+
+	logInfo("iFlow updated");
+	logInfo(res);
+};
+
+export const saveAsNewVersion = async (id: string) => {
 	const currentIflow = await integrationDesigntimeArtifactsApi
 		.requestBuilder()
 		.getByKey(id, "active")
 		.execute(await getCurrentDestionation());
 
-	// Sorry
-	currentIflow.artifactContent = iflowBuffer as unknown as string;
+	const newVersion = semver.inc(currentIflow.version, "patch");
 
-	await integrationDesigntimeArtifactsApi
-		.requestBuilder()
-		.update(currentIflow)
-		.execute(await getCurrentDestionation());
+	if (!newVersion) {
+		throw new Error("Error increasing semantic version");
+	}
+
+	await integrationDesigntimeArtifactSaveAsVersion({
+		id,
+		saveAsVersion: newVersion,
+	}).execute(await getCurrentDestionation());
 };
 
 export const deployIflow = async (id: string) => {

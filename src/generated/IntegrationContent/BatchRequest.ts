@@ -20,7 +20,7 @@ import {
   RuntimeArtifactErrorInformations,
   Configurations,
   Resources,
-  IntegrationRuntimeArtifacts_1,
+  IntegrationRuntimeArtifacts,
   IntegrationPackages,
   ServiceEndpoints,
   EntryPoints,
@@ -129,7 +129,7 @@ export type ReadIntegrationContentRequestBuilder<
   | GetAllRequestBuilder<Configurations<DeSerializersT>, DeSerializersT>
   | GetAllRequestBuilder<Resources<DeSerializersT>, DeSerializersT>
   | GetAllRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
+      IntegrationRuntimeArtifacts<DeSerializersT>,
       DeSerializersT
     >
   | GetAllRequestBuilder<IntegrationPackages<DeSerializersT>, DeSerializersT>
@@ -165,10 +165,6 @@ export type ReadIntegrationContentRequestBuilder<
   | GetAllRequestBuilder<BuildAndDeployStatus<DeSerializersT>, DeSerializersT>
   | GetAllRequestBuilder<MdiDeltaToken<DeSerializersT>, DeSerializersT>
   | GetAllRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
-      DeSerializersT
-    >
-  | GetAllRequestBuilder<
       ScriptCollectionDesigntimeArtifacts<DeSerializersT>,
       DeSerializersT
     >
@@ -189,7 +185,7 @@ export type ReadIntegrationContentRequestBuilder<
   | GetByKeyRequestBuilder<Configurations<DeSerializersT>, DeSerializersT>
   | GetByKeyRequestBuilder<Resources<DeSerializersT>, DeSerializersT>
   | GetByKeyRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
+      IntegrationRuntimeArtifacts<DeSerializersT>,
       DeSerializersT
     >
   | GetByKeyRequestBuilder<IntegrationPackages<DeSerializersT>, DeSerializersT>
@@ -224,10 +220,6 @@ export type ReadIntegrationContentRequestBuilder<
     >
   | GetByKeyRequestBuilder<BuildAndDeployStatus<DeSerializersT>, DeSerializersT>
   | GetByKeyRequestBuilder<MdiDeltaToken<DeSerializersT>, DeSerializersT>
-  | GetByKeyRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
-      DeSerializersT
-    >
   | GetByKeyRequestBuilder<
       ScriptCollectionDesigntimeArtifacts<DeSerializersT>,
       DeSerializersT
@@ -272,15 +264,15 @@ export type WriteIntegrationContentRequestBuilder<
   | UpdateRequestBuilder<Resources<DeSerializersT>, DeSerializersT>
   | DeleteRequestBuilder<Resources<DeSerializersT>, DeSerializersT>
   | CreateRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
+      IntegrationRuntimeArtifacts<DeSerializersT>,
       DeSerializersT
     >
   | UpdateRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
+      IntegrationRuntimeArtifacts<DeSerializersT>,
       DeSerializersT
     >
   | DeleteRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
+      IntegrationRuntimeArtifacts<DeSerializersT>,
       DeSerializersT
     >
   | CreateRequestBuilder<IntegrationPackages<DeSerializersT>, DeSerializersT>
@@ -379,18 +371,6 @@ export type WriteIntegrationContentRequestBuilder<
   | CreateRequestBuilder<MdiDeltaToken<DeSerializersT>, DeSerializersT>
   | UpdateRequestBuilder<MdiDeltaToken<DeSerializersT>, DeSerializersT>
   | DeleteRequestBuilder<MdiDeltaToken<DeSerializersT>, DeSerializersT>
-  | CreateRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
-      DeSerializersT
-    >
-  | UpdateRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
-      DeSerializersT
-    >
-  | DeleteRequestBuilder<
-      IntegrationRuntimeArtifacts_1<DeSerializersT>,
-      DeSerializersT
-    >
   | CreateRequestBuilder<
       ScriptCollectionDesigntimeArtifacts<DeSerializersT>,
       DeSerializersT

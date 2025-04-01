@@ -7,6 +7,7 @@ import { IntegrationDesigntimeArtifactsApi } from './IntegrationDesigntimeArtifa
 import { RuntimeArtifactErrorInformationsApi } from './RuntimeArtifactErrorInformationsApi';
 import { ConfigurationsApi } from './ConfigurationsApi';
 import { ResourcesApi } from './ResourcesApi';
+import { IntegrationRuntimeArtifactsApi } from './IntegrationRuntimeArtifactsApi';
 import { IntegrationPackagesApi } from './IntegrationPackagesApi';
 import { ServiceEndpointsApi } from './ServiceEndpointsApi';
 import { EntryPointsApi } from './EntryPointsApi';
@@ -24,7 +25,6 @@ import { MessageMappingDesigntimeArtifactsApi } from './MessageMappingDesigntime
 import { IntegrationDesigntimeLocksApi } from './IntegrationDesigntimeLocksApi';
 import { BuildAndDeployStatusApi } from './BuildAndDeployStatusApi';
 import { MdiDeltaTokenApi } from './MdiDeltaTokenApi';
-import { IntegrationRuntimeArtifacts_1Api } from './IntegrationRuntimeArtifacts_1Api';
 import { ScriptCollectionDesigntimeArtifactsApi } from './ScriptCollectionDesigntimeArtifactsApi';
 import { DefaultValMapsApi } from './DefaultValMapsApi';
 import { DesignGuidelineExecutionResultsApi } from './DesignGuidelineExecutionResultsApi';
@@ -178,6 +178,20 @@ class IntegrationContent<
     return this.initApi('resourcesApi', ResourcesApi);
   }
 
+  get integrationRuntimeArtifactsApi(): IntegrationRuntimeArtifactsApi<DeSerializersT> {
+    const api = this.initApi(
+      'integrationRuntimeArtifactsApi',
+      IntegrationRuntimeArtifactsApi
+    );
+    const linkedApis = [
+      this.initApi(
+        'runtimeArtifactErrorInformationsApi',
+        RuntimeArtifactErrorInformationsApi
+      )
+    ];
+    api._addNavigationProperties(linkedApis);
+    return api;
+  }
 
   get integrationPackagesApi(): IntegrationPackagesApi<DeSerializersT> {
     const api = this.initApi('integrationPackagesApi', IntegrationPackagesApi);
@@ -301,21 +315,6 @@ class IntegrationContent<
 
   get mdiDeltaTokenApi(): MdiDeltaTokenApi<DeSerializersT> {
     return this.initApi('mdiDeltaTokenApi', MdiDeltaTokenApi);
-  }
-
-  get integrationRuntimeArtifacts_1Api(): IntegrationRuntimeArtifacts_1Api<DeSerializersT> {
-    const api = this.initApi(
-      'integrationRuntimeArtifacts_1Api',
-      IntegrationRuntimeArtifacts_1Api
-    );
-    const linkedApis = [
-      this.initApi(
-        'runtimeArtifactErrorInformationsApi',
-        RuntimeArtifactErrorInformationsApi
-      )
-    ];
-    api._addNavigationProperties(linkedApis);
-    return api;
   }
 
   get scriptCollectionDesigntimeArtifactsApi(): ScriptCollectionDesigntimeArtifactsApi<DeSerializersT> {

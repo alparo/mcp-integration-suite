@@ -1,8 +1,12 @@
+// First call so the imports can use the variable
+import path from 'path';
+export const projPath = path.resolve(__dirname, '..');
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerAllHandlers } from "./handlers";
 import { config } from 'dotenv';
-import path from 'path';
+
 import { exit } from "process";
 import './utils/logging.js';
 import { writeToLog } from "./utils/logging.js";
@@ -11,8 +15,6 @@ process.on('uncaughtException', err => {
 	logError(err);
 	exit(2);
 });
-
-export const projPath = path.resolve(__dirname, '..');
 
 config({ path: path.join(projPath, '.env') });
 

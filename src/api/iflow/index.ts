@@ -6,7 +6,6 @@ import { updateIflowFiles } from "../../handlers/iflow/tools";
 import { z } from "zod";
 import semver from "semver";
 import {
-	DeployIntegrationAdapterDesigntimeArtifactParameters,
 	deployIntegrationDesigntimeArtifact,
 	integrationDesigntimeArtifactSaveAsVersion,
 } from "../../generated/IntegrationContent";

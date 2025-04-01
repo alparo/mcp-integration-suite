@@ -83,12 +83,13 @@ Some ressources might relay on other package artefacts which are not included bu
 	server.tool(
 		"update-iflow",
 		`Update or create files/content of an iflow
-		You only have to provide files that need to be updated
-        Folder structure is like this:
-        src/main/resources/ is the root
-        src/main/resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
-        src/main/resources/scripts contains groovy and javascript scripts that can be used within iflow
-        src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the iflow in xml structure
+You only have to provide files that need to be updated but allways send the full file
+Make sure you ONLY change the things the user instructs you to and keep all other things
+Folder structure is like this:
+src/main/resources/ is the root
+src/main/resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
+src/main/resources/scripts contains groovy and javascript scripts that can be used within iflow
+src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the iflow in xml structure
         `,
 		{
 			id: z.string().describe("ID of the IFLOW"),

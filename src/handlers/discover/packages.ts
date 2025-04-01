@@ -3,10 +3,6 @@ import { promises as fs } from 'fs';
 import path from "path";
 
 
-enum iflowExamples {
-    simple_http_server_to_http = ""
-};
-
 const resourceDiscoverPath = path.resolve(__dirname, '../../../resources/Discover');
 
 export const registerPackageDiscoverHandler = (server: McpServer) => {

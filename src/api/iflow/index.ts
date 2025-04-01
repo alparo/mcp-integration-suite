@@ -63,7 +63,7 @@ export const createIflow = async (
 export const updateIflow = async (
 	id: string,
 	iflowFiles: z.infer<typeof updateIflowFiles>
-) => {
+): Promise<string> => {
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
@@ -116,7 +116,10 @@ export const updateIflow = async (
 
 	logInfo(iflowResponse.status);
 	logInfo(iflowResponse.statusText);
-	logInfo(await iflowResponse.text());
+	const respText = await iflowResponse.text();
+	logInfo(respText);
+
+	return `${iflowResponse.status} - ${await iflowResponse.text()} - ${respText}`;
 };
 
 export const saveAsNewVersion = async (id: string) => {

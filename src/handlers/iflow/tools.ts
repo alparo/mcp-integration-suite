@@ -1,6 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
-import { createIflow, deployIflow, getIflowContentString, saveAsNewVersion, updateIflow } from "../../api/iflow";
+import {
+	createIflow,
+	deployIflow,
+	getIflowContentString,
+	saveAsNewVersion,
+	updateIflow,
+} from "../../api/iflow";
 import { logError, logInfo } from "../..";
 
 export const updateIflowFiles = z.array(
@@ -28,9 +34,17 @@ Some ressources might relay on other package artefacts which are not included bu
 			try {
 				const fileContent = await getIflowContentString(id);
 				//const escapedFileContent = escapeDoublequotes(fileContent);
-				
+
 				return {
-					content: [{ type: "text", text: JSON.stringify({type: "success", iflowContent: fileContent}) }],
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({
+								type: "success",
+								iflowContent: fileContent,
+							}),
+						},
+					],
 				};
 			} catch (error) {
 				logError(error);
@@ -38,7 +52,7 @@ Some ressources might relay on other package artefacts which are not included bu
 					content: [
 						{
 							type: "text",
-							text: JSON.stringify({type: "error", error}),
+							text: JSON.stringify({ type: "error", error }),
 						},
 					],
 					isError: true,
@@ -71,7 +85,7 @@ Some ressources might relay on other package artefacts which are not included bu
 					content: [
 						{
 							type: "text",
-							text: JSON.stringify({type: "error", error}),
+							text: JSON.stringify({ type: "error", error }),
 						},
 					],
 					isError: true,
@@ -104,21 +118,23 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 		async ({ id, files, autoDeploy }) => {
 			logInfo(`Updating iflow ${id} autodeploy: ${autoDeploy}`);
 
-
 			try {
-                await updateIflow(id, files);
-                logInfo("Iflow updated successfully");
-                if (autoDeploy) {
-                    logInfo("auto deploy is activated");
+				const result = await updateIflow(id, files);
+				logInfo("Iflow updated successfully");
+				if (autoDeploy) {
+					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
-                    await deployIflow(id);
-                }
+					await deployIflow(id);
+				}
 
 				return {
 					content: [
 						{
 							type: "text",
-							text: "IFlow successfully updated",
+							text: JSON.stringify({
+								type: "server response",
+								content: result,
+							}),
 						},
 					],
 				};

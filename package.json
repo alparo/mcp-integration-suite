@@ -30,6 +30,7 @@
         "dotenv": "^16.4.7",
         "glob": "^11.0.1",
         "mcps-logger": "^1.0.0-rc.4",
+        "rimraf": "^6.0.1",
         "semver": "^7.7.1",
         "zip-a-folder": "^3.1.9",
         "zod": "^3.20.0"

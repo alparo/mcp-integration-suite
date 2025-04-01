@@ -10,6 +10,8 @@ export const registerMessageHandlers = (server: McpServer) => {
 send an HTTP request to integration suite.
 If you need to get HTTP Endpoints please use get-iflow-endpoints
 Please only provide HTTP Path without endpoint etc if the URL is https://abc123.itcpi01-rt-cfapps.aa11.hana.ondemand.com/http/myendpoint You should send /http/myendpoint
+
+If not specified otherwise the user probably wants to see the text in response
         `,
 		sendRequestSchema,
 		async ({ path, method, contentType, body, headers }) => {

@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { projPath } from "..";
+import { logInfo, projPath } from "..";
 import AdmZip from 'adm-zip';
 import path from "node:path";
 
@@ -24,7 +24,8 @@ export const extractToFolder = async(zipBuf: Buffer, id: string): Promise<string
 
 export const folderToZipBuffer = async (path: string): Promise<Buffer<ArrayBufferLike>> => {
 	const zip = new AdmZip();
-	await zip.addLocalFolderPromise(path, {});
-	return zip.toBuffer();
+	logInfo(`Adding ${path} to ZIP archive`);
+	zip.addLocalFolder(path);
+	return zip.toBufferPromise();
 
 };

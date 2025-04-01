@@ -94,8 +94,6 @@ export const updateIflow = async (
 
 	logInfo(`Request URI: ${requestURI}`);
 
-	writeFileSync('/Users/1nbuc/devshit/mcp-integration-suite/debug.zip', iflowBuffer);
-
 	const newIflowObj = {
 		Name: id,
 		ArtifactContent: iflowBuffer.toString('base64')

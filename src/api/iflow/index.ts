@@ -1,6 +1,6 @@
 import { integrationContent } from "../../generated/IntegrationContent/service";
 import { extractToFolder, folderToZipBuffer, patchFile } from "../../utils/zip";
-import { getCurrentDestionation, getOAuthToken } from "../destination";
+import { getCurrentDestionation, getOAuthToken } from "../api_destination";
 import { updateIflowFiles } from "../../handlers/iflow/tools";
 
 import { z } from "zod";
@@ -161,13 +161,18 @@ export const getEndpoints = async (id?: string) => {
 	let endpointRequest = serviceEndpointsApi.requestBuilder().getAll();
 
 	if (id) {
-		endpointRequest = endpointRequest.filter(serviceEndpointsApi.schema.ID.equals(id));
+		endpointRequest = endpointRequest.filter(
+			serviceEndpointsApi.schema.NAME.equals(id)
+		);
 	}
 
-	const endpoints = await endpointRequest.execute(await getCurrentDestionation());
+	logInfo(`Requesting Endpoints on ${await endpointRequest.url(await getCurrentDestionation())}`);
+	const endpoints = await endpointRequest.execute(
+		await getCurrentDestionation()
+	);
 	const endpointsWithUrl: (ServiceEndpoints & { URL?: string })[] = endpoints;
 
-	endpointsWithUrl.map(endpoint => {
+	endpointsWithUrl.map((endpoint) => {
 		endpoint.URL = getEndpointUrl(endpoint);
 	});
 

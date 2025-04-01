@@ -34,5 +34,6 @@ export const getEndpointUrl = (endpoint: ServiceEndpoints): string => {
         return '';
     }
 
-    return `${protocolObj.trailingProtocol}://${process.env['CPI_BASE_URL']}${protocolObj.URIProtocol}${endpointIdentifier}`;
+    // for now only supports https:// 
+    return `${process.env['CPI_BASE_URL']}${protocolObj.URIProtocol}${endpointIdentifier}`;
 }

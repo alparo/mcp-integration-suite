@@ -1,31 +1,30 @@
-
 import {
 	HttpDestinationOrFetchOptions,
 	retrieveJwt,
 	DestinationAuthToken,
 } from "@sap-cloud-sdk/connectivity";
 
-
-
-// Cache für das Token
+// Token cache
 let tokenCache: {
 	token: DestinationAuthToken;
 	expiresAt: number;
 } | null = null;
 
 export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
-	// Prüfen, ob ein gültiges Token im Cache ist (mit 5 Minuten Puffer)
+	// Check if token is expired
 	const now = Date.now();
 	if (tokenCache && tokenCache.expiresAt > now + 5 * 60 * 1000) {
 		return tokenCache.token;
 	}
-;
 	const params = new URLSearchParams();
 	params.append("grant_type", "client_credentials");
-	params.append("client_id", process.env.OAUTH_CLIENT_ID as string);
-	params.append("client_secret", process.env.OAUTH_CLIENT_SECRET as string);
+	params.append("client_id", process.env.API_OAUTH_CLIENT_ID as string);
+	params.append(
+		"client_secret",
+		process.env.API_OAUTH_CLIENT_SECRET as string
+	);
 
-	const response = await fetch(process.env.OAUTH_TOKEN_URL as string, {
+	const response = await fetch(process.env.API_OAUTH_TOKEN_URL as string, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
@@ -41,7 +40,7 @@ export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 
 	const data = await response.json();
 
-	// Token erstellen
+	// create token
 	const token = {
 		value: data.access_token,
 		type: data.token_type,
@@ -53,7 +52,7 @@ export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 		error: null,
 	};
 
-	// Token im Cache speichern
+	// save token to cache
 	tokenCache = {
 		token,
 		expiresAt: now + data.expires_in * 1000,

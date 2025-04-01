@@ -88,6 +88,7 @@ Make sure you ONLY change the things the user instructs you to and keep all othe
 Folder structure is like this:
 src/main/resources/ is the root
 src/main/resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
+src/main/resources/xsd contains all xsd file in format <filename>.xsd
 src/main/resources/scripts contains groovy and javascript scripts that can be used within iflow
 src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the iflow in xml structure
         `,

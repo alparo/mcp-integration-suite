@@ -2,8 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import path from "path";
 import { z } from "zod";
 import { parseFolder } from "../../utils/fileBasedUtils";
+import { projPath } from "../..";
 
-const basePath = path.resolve(__dirname, "../../../resources/examples/iflows/");
+const basePath = path.resolve(projPath, "./resources/examples/iflows/");
 
 const availableExamples: {
 	[name: string]: { description: string; _path: string };

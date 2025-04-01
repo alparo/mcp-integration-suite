@@ -13,9 +13,8 @@ import {
 } from "../../generated/IntegrationContent";
 import { logInfo } from "../..";
 import { logExecutionTimeOfAsyncFunc } from "../../utils/performanceTrace";
-const {
-	integrationDesigntimeArtifactsApi,
-} = integrationContent();
+import { writeFileSync } from "fs";
+const { integrationDesigntimeArtifactsApi } = integrationContent();
 
 const unzipperToYazl = async (
 	unzipper: unzipper.CentralDirectory
@@ -125,19 +124,42 @@ export const updateIflow = async (
 		"get current iflow"
 	);
 
-	// Sorry
-	currentIflow.artifactContent = iflowBuffer as unknown as string;
+	currentIflow.version = "active";
 
-	const res = await logExecutionTimeOfAsyncFunc(
-		integrationDesigntimeArtifactsApi
-			.requestBuilder()
-			.update(currentIflow)
-			.execute(await getCurrentDestionation()),
-		"Update iflow"
-	);
+	const requestURI = await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.update(currentIflow)
+		.url(await getCurrentDestionation());
 
-	logInfo("iFlow updated");
-	logInfo(res);
+	
+
+	logInfo(`Request URI: ${requestURI}`);
+
+	writeFileSync('/Users/1nbuc/devshit/mcp-integration-suite/debug.zip', iflowBuffer);
+
+	const newIflowObj = {
+		Name: id,
+		ArtifactContent: iflowBuffer.toString('base64')
+	};
+
+	const reqBody = JSON.stringify(newIflowObj);
+	logInfo(reqBody);
+
+	const authHeader = (await getOAuthToken()).http_header;
+
+	// Use fetch instead of built in axios because it is trash
+	const iflowResponse = await fetch(requestURI, {
+		headers: { [authHeader.key]: authHeader.value,
+			"Content-Type": "application/json"
+		 },
+		body: reqBody,
+		method: 'PUT',
+		
+	});
+
+	logInfo(iflowResponse.status);
+	logInfo(iflowResponse.statusText);
+	logInfo(await iflowResponse.text());
 };
 
 export const saveAsNewVersion = async (id: string) => {
@@ -151,6 +173,10 @@ export const saveAsNewVersion = async (id: string) => {
 	if (!newVersion) {
 		throw new Error("Error increasing semantic version");
 	}
+
+	logInfo(
+		`Increasing iflow ${id} from version ${currentIflow.version} to ${newVersion}`
+	);
 
 	await integrationDesigntimeArtifactSaveAsVersion({
 		id,

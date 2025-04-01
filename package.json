@@ -32,6 +32,7 @@
         "semver": "^7.7.1",
         "unzipper": "^0.12.3",
         "yazl": "^3.3.1",
+        "zip-a-folder": "^3.1.9",
         "zod": "^3.20.0"
     },
     "devDependencies": {

@@ -10,9 +10,11 @@ import { writeToLog } from "./utils/logging.js";
 process.on('uncaughtException', err => {
 	logError(err);
 	exit(2);
-})
+});
 
-config({ path: path.resolve(__dirname, '../.env') });
+export const projPath = path.resolve(__dirname, '..');
+
+config({ path: path.join(projPath, '.env') });
 
 const server = new McpServer({
 	name: "integration-suite",

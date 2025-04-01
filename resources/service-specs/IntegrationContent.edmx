@@ -505,8 +505,8 @@
                 <EntitySet Name="BuildAndDeployStatus"
                     EntityType="com.sap.hci.api.BuildAndDeployStatus" />
                 <EntitySet Name="MDIDeltaToken" EntityType="com.sap.hci.api.MDIDeltaToken" />
-                <EntitySet Name="IntegrationRuntimeArtifacts"
-                    EntityType="com.sap.hci.api.IntegrationRuntimeArtifact" />
+                <!-- for some reason exists two times <EntitySet Name="IntegrationRuntimeArtifacts"
+                    EntityType="com.sap.hci.api.IntegrationRuntimeArtifact" /> -->
                 <EntitySet Name="ScriptCollectionDesigntimeArtifacts"
                     EntityType="com.sap.hci.api.ScriptCollectionDesigntimeArtifact" />
                 <EntitySet Name="DefaultValMaps" EntityType="com.sap.hci.api.DefaultValMap" />

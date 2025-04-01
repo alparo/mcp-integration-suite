@@ -12,9 +12,11 @@
         }
     },
     "scripts": {
-        "build": "tsc -p tsconfig.json",
+        "build:generateclient": "node src/scripts/buildOdataClient.js",
+        "build:tsc": "tsc -p tsconfig.json",
+        "build": "npm run build:generateclient && npm run build:tsc",
         "start": "node dist/server.js",
-        "dev": "npm run build && npm run dev:inspector",
+        "dev": "npm run build:tsc && npm run dev:inspector",
         "dev:inspector": "npx @modelcontextprotocol/inspector node",
         "test": "npm run build && node dist/test.js",
         "watch": "npm-watch dev",

@@ -1,6 +1,8 @@
 import { generate } from '@sap-cloud-sdk/generator';
+import path from 'path';
 
 // Create your options, adapt the input & output directory as well as the package name according to your setup.
+// The edmx files in this directory are from api.sap.com but are sometimes adjusted because otherwise client generation will fail
 const input = 'resources/service-specs';
 const outputDir = 'src/generated';
 
@@ -12,9 +14,9 @@ const generatorConfig = {
   clearOutputDir: true,
   skipValidation: true,
   generateTypedocJson: false,
-  packageJson: false
+  packageJson: false,
   /* optional:
-    optionsPerService: 'test/directory',
+    
     include: 'glob of files to include'
   */
 };

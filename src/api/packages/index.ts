@@ -1,3 +1,4 @@
+import { IntegrationPackages } from "../../generated/IntegrationContent/index.js";
 import { IntegrationPackagesApi } from "../../generated/IntegrationContent/IntegrationPackagesApi.js";
 import { integrationContent } from "../../generated/IntegrationContent/service.js";
 import { getCurrentDestionation } from "../destination.js";

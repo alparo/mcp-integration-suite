@@ -3,11 +3,13 @@ import { z } from "zod";
 import {
 	createIflow,
 	deployIflow,
+	getEndpoints,
 	getIflowContentString,
 	saveAsNewVersion,
 	updateIflow,
 } from "../../api/iflow";
 import { logError, logInfo } from "../..";
+import { getEndpointUrl } from "../../utils/getEndpointUrl";
 
 export const updateIflowFiles = z.array(
 	z.object({
@@ -150,6 +152,32 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 					isError: true,
 				};
 			}
+		}
+	);
+
+	server.tool(
+		"get-iflow-endpoints",
+		`
+Get endpoint(s) of iflow and its URLs and Protocols
+		`,
+		{
+			iflowId: z
+				.string()
+				.optional()
+				.describe(
+					"Iflow ID. By default it will get all endpoints"
+				),
+		},
+		async ({ iflowId }) => {
+			const endpoints = await getEndpoints(iflowId);
+			return {
+				content: [
+					{
+						type: "text",
+						text: JSON.stringify({type: "success", endpoints}),
+					},
+				],
+			};
 		}
 	);
 };

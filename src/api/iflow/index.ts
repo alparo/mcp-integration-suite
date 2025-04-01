@@ -8,13 +8,16 @@ import semver from "semver";
 import {
 	deployIntegrationDesigntimeArtifact,
 	integrationDesigntimeArtifactSaveAsVersion,
+	ServiceEndpoints,
 } from "../../generated/IntegrationContent";
 import { logInfo } from "../..";
 import { logExecutionTimeOfAsyncFunc } from "../../utils/performanceTrace";
 import { writeFileSync } from "fs";
 import { parseFolder } from "../../utils/fileBasedUtils";
-const { integrationDesigntimeArtifactsApi } = integrationContent();
-
+import { GetAllRequestBuilder } from "@sap-cloud-sdk/odata-v2";
+import { getEndpointUrl } from "../../utils/getEndpointUrl";
+const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
+	integrationContent();
 
 const getIflowFolder = async (id: string): Promise<string> => {
 	const iflowUrl = await logExecutionTimeOfAsyncFunc(
@@ -90,13 +93,11 @@ export const updateIflow = async (
 		.update(currentIflow)
 		.url(await getCurrentDestionation());
 
-	
-
 	logInfo(`Request URI: ${requestURI}`);
 
 	const newIflowObj = {
 		Name: id,
-		ArtifactContent: iflowBuffer.toString('base64')
+		ArtifactContent: iflowBuffer.toString("base64"),
 	};
 
 	const reqBody = JSON.stringify(newIflowObj);
@@ -106,12 +107,12 @@ export const updateIflow = async (
 
 	// Use fetch instead of built in axios because it is trash
 	const iflowResponse = await fetch(requestURI, {
-		headers: { [authHeader.key]: authHeader.value,
-			"Content-Type": "application/json"
-		 },
+		headers: {
+			[authHeader.key]: authHeader.value,
+			"Content-Type": "application/json",
+		},
 		body: reqBody,
-		method: 'PUT',
-		
+		method: "PUT",
 	});
 
 	logInfo(iflowResponse.status);
@@ -151,7 +152,24 @@ export const deployIflow = async (id: string) => {
 	}).execute(await getCurrentDestionation());
 };
 
-export const getIflowContentString = async(id: string): Promise<string> => {
+export const getIflowContentString = async (id: string): Promise<string> => {
 	const folderPath = await getIflowFolder(id);
-	return parseFolder(folderPath);	
-}
+	return parseFolder(folderPath);
+};
+
+export const getEndpoints = async (id?: string) => {
+	let endpointRequest = serviceEndpointsApi.requestBuilder().getAll();
+
+	if (id) {
+		endpointRequest = endpointRequest.filter(serviceEndpointsApi.schema.ID.equals(id));
+	}
+
+	const endpoints = await endpointRequest.execute(await getCurrentDestionation());
+	const endpointsWithUrl: (ServiceEndpoints & { URL?: string })[] = endpoints;
+
+	endpointsWithUrl.map(endpoint => {
+		endpoint.URL = getEndpointUrl(endpoint);
+	});
+
+	return endpoints;
+};

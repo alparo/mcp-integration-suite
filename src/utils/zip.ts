@@ -8,7 +8,9 @@ export const patchFile = async (
 	zipPath: string,
 	content: string
 ): Promise<void> => {
-	await writeFile(path.join(basePath, zipPath), content);
+	const filePath = path.join(basePath, zipPath);
+	await mkdir(path.dirname(filePath), { recursive: true });
+	await writeFile(filePath, content);
 	return;
 };
 

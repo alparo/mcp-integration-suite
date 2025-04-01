@@ -2,7 +2,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
 import { createIflow, deployIflow, getIflow, saveAsNewVersion, updateIflow } from "../../api/iflow";
 import { logError, logInfo } from "../..";
-import { addDoublequotes, doublequotes, escapeDoublequotes } from "../../utils/specialchars";
 
 export const updateIflowFiles = z.array(
 	z.object({
@@ -11,7 +10,7 @@ export const updateIflowFiles = z.array(
 			.describe(
 				'filepath within project. E.g. "resources/scenarioflows/integrationflow/myiflow.iflw'
 			),
-		content: z.string().describe(`File content. Use ${doublequotes} for a single backslash to avoid parsing errors `),
+		content: z.string().describe(`File content.`),
 	})
 );
 
@@ -19,9 +18,7 @@ export const registerIflowHandlers = (server: McpServer) => {
 	server.tool(
 		"get-iflow",
 		`Get the data of an iflow and the contained ressources. 
-Doublequotes are replaced with ${doublequotes}
 Some ressources might relay on other package artefacts which are not included but reffrenced
-doublequotes are replaced by 
 `,
 		{
 			id: z.string().describe("ID of the IFLOW"),
@@ -30,10 +27,10 @@ doublequotes are replaced by
 			logInfo(`trying to get iflow ${id}`);
 			try {
 				const fileContent = await getIflow(id);
-				const escapedFileContent = escapeDoublequotes(fileContent);
+				//const escapedFileContent = escapeDoublequotes(fileContent);
 				
 				return {
-					content: [{ type: "text", text: JSON.stringify({type: "success", iflowContent: escapedFileContent}) }],
+					content: [{ type: "text", text: JSON.stringify({type: "success", iflowContent: fileContent}) }],
 				};
 			} catch (error) {
 				logError(error);
@@ -87,7 +84,6 @@ doublequotes are replaced by
 		"update-iflow",
 		`Update or create files/content of an iflow
 		You only have to provide files that need to be updated
-		For file content use ${doublequotes} instead of just doublequotes otherwise you will get json parsing errors
         Folder structure is like this:
         src/main/resources/ is the root
         src/main/resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
@@ -106,10 +102,6 @@ doublequotes are replaced by
 		async ({ id, files, autoDeploy }) => {
 			logInfo(`Updating iflow ${id} autodeploy: ${autoDeploy}`);
 
-			files.map(file => {
-				file.content = addDoublequotes(file.content);
-				return file;
-			});
 
 			try {
                 await updateIflow(id, files);

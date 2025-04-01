@@ -88,6 +88,7 @@ const yazlToBuf = async (
 		yazlZip.outputStream.on("data", (chunk) => chunks.push(chunk));
 		yazlZip.outputStream.on("end", () => resolve(Buffer.concat(chunks)));
 		yazlZip.outputStream.on("error", reject);
+		yazlZip.end();
 	});
 };
 

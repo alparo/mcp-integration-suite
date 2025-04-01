@@ -3,6 +3,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { registerAllHandlers } from "./handlers";
 import { config } from 'dotenv';
 import path from 'path';
+import { exit } from "process";
+import './utils/logging.js';
+import { writeToLog } from "./utils/logging.js";
+
+process.on('uncaughtException', err => {
+	logError(err);
+	exit(2);
+})
 
 config({ path: path.resolve(__dirname, '../.env') });
 
@@ -19,18 +27,32 @@ registerAllHandlers(server);
 
 async function main() {
 	const transport = new StdioServerTransport();
+	
 	await server.connect(transport);
 }
 
-main().catch((error) => {
-	console.error("Fatal error in main():", error);
-	process.exit(1);
-});
-
-export const logError = (msg: string): void => {
-	server.server.sendLoggingMessage({level: "error", data: msg});
+export const logError = (msg: any): void => {
+	writeToLog(msg);
+	// try {
+	// 	server.server.sendLoggingMessage({level: "error", data: msg});
+	// } catch {
+		
+	// }
+	
 }
 
-export const logInfo = (msg: string): void => {
-	server.server.sendLoggingMessage({level: "info", data: msg});
+export const logInfo = (msg: any): void => {
+	writeToLog(msg);
+	// try {
+	// 	server.server.sendLoggingMessage({level: "info", data: msg});
+	// } catch {
+		
+	// }
+	
 }
+
+main().catch(err => {
+	logError(err);
+	console.error(err);
+	exit(1);
+}).then(() => writeToLog("server started"));

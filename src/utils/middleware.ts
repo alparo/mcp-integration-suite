@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-type MiddlewareFunction = (next: () => Promise<void>) => Promise<void>;
+type MiddlewareFunction = (next: () => Promise<void>, name: string, params: z.ZodRawShape) => Promise<void>;
 
 export class MiddlewareManager {
 	private middlewares: MiddlewareFunction[] = [];
@@ -10,14 +10,14 @@ export class MiddlewareManager {
 		this.middlewares.push(middleware);
 	}
 
-	async execute() {
+	async execute(name: string, params: z.ZodRawShape) {
 		const executeMiddleware = async (index: number): Promise<void> => {
 			if (index >= this.middlewares.length) {
 				return;
 			}
 
 			const middleware = this.middlewares[index];
-			await middleware(() => executeMiddleware(index + 1));
+			await middleware(() => executeMiddleware(index + 1), name, params);
 		};
 
 		await executeMiddleware(0);
@@ -83,7 +83,7 @@ export class McpServerWithMiddleware extends McpServer {
 			args: { [x: string]: any },
 			extra: { [x: string]: unknown }
 		) => {
-			await this.middlewareManager.execute();
+			await this.middlewareManager.execute(name, params);
 			return handler(args, extra);
 		};
 

@@ -1,18 +1,24 @@
 
+import path from "path";
 import { z } from "zod";
 import { parseFolder } from "../../utils/fileBasedUtils";
+import { projPath } from "../..";
 import { availableExamples } from "../../api/iflow/examples";
 import { McpServerWithMiddleware } from "../../utils/middleware";
 
 export const registerIflowExampleHandler = (server: McpServerWithMiddleware) => {
-	server.resource(
-		"List of available iflow examples. Use them with get-iflow-example",
-		"cpi://iflow/examples",
-		async(uri) => {
+	server.registerTool(
+		"list-iflow-examples",
+		`
+Get a list of available iflow examples.
+You can use these examples to query get-iflow-example
+        `,
+		{},
+		async() => {
 			return {
-				contents: [
+				content: [
 					{
-						uri: uri.href,
+						type: "text",
 						text: JSON.stringify(availableExamples),
 					},
 				],

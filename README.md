@@ -7,10 +7,8 @@ A ModelContextProtocol (MCP) Server for SAP Integration Suite.
 # Node Runtime
 NodeJs and NPM (Node Version > 20)
 
-# TODO Queries
-- Send HTTP Requests to endpoints
-- Get endpoint of IFLOW
+# TODOs
 - CRUD Standalone Message Mappings
 - Message Mapping Examples
-- Check Deployment status
- 
+- Check Deployment/Error status
+- Provide default prompt

@@ -9,6 +9,7 @@ export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 		"Get all integration packages",
 		{},
 		async () => {
+			throw new Error('test')
 			const allPackages = await getPackages();
 			return {
 				content: [{ type: "text", text: JSON.stringify(allPackages) }],

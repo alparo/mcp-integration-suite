@@ -37,21 +37,22 @@ async function main() {
 
 export const logError = (msg: any): void => {
 	writeToLog(msg);
-	// try {
-	// 	server.server.sendLoggingMessage({level: "error", data: msg});
-	// } catch {
+	try {
+		// just causes lots of error messages on most client because it is not implemented
+		//server.server.sendLoggingMessage({level: "error", data: JSON.stringify(msg)});
+	} catch {
 		
-	// }
+	}
 	
 }
 
 export const logInfo = (msg: any): void => {
 	writeToLog(msg);
-	// try {
-	// 	server.server.sendLoggingMessage({level: "info", data: msg});
-	// } catch {
+	try {
+		//server.server.sendLoggingMessage({level: "info", data: JSON.stringify(msg)});
+	} catch {
 		
-	// }
+	}
 	
 }
 

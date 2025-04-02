@@ -1,7 +1,7 @@
 import { integrationContent } from "../../generated/IntegrationContent/service";
 import { extractToFolder, folderToZipBuffer, patchFile } from "../../utils/zip";
 import { getCurrentDestionation, getOAuthToken } from "../api_destination";
-import { updateIflowFiles } from "../../handlers/iflow/tools";
+import { updateFiles } from "../../handlers/iflow/tools";
 
 import { z } from "zod";
 import semver from "semver";
@@ -59,13 +59,12 @@ export const createIflow = async (
 
 export const updateIflow = async (
 	id: string,
-	iflowFiles: z.infer<typeof updateIflowFiles>
-): Promise<string> => {
+	iflowFiles: z.infer<typeof updateFiles>
+): Promise<{ iflowUpdate: { status: number; text: string }, deployStatus?: string }> => {
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
-		await patchFile(iflowPath, file.filepath, file.content),
-			`Patch file ${file.filepath}`;
+		await patchFile(iflowPath, file.filepath, file.content);
 	}
 
 	const iflowBuffer = await folderToZipBuffer(iflowPath);
@@ -74,7 +73,6 @@ export const updateIflow = async (
 		.requestBuilder()
 		.getByKey(id, "active")
 		.execute(await getCurrentDestionation());
-	
 
 	currentIflow.version = "active";
 
@@ -105,12 +103,14 @@ export const updateIflow = async (
 		method: "PUT",
 	});
 
-	logInfo(iflowResponse.status);
-	logInfo(iflowResponse.statusText);
 	const respText = await iflowResponse.text();
-	logInfo(respText);
 
-	return `${iflowResponse.status} - ${await iflowResponse.text()} - ${respText}`;
+	return {
+		iflowUpdate: {
+			status: iflowResponse.status,
+			text: respText,
+		},
+	};
 };
 
 export const saveAsNewVersion = async (id: string) => {
@@ -132,13 +132,6 @@ export const saveAsNewVersion = async (id: string) => {
 	await integrationDesigntimeArtifactSaveAsVersion({
 		id,
 		saveAsVersion: newVersion,
-	}).execute(await getCurrentDestionation());
-};
-
-export const deployIflow = async (id: string) => {
-	await deployIntegrationDesigntimeArtifact({
-		id,
-		version: "active",
 	}).execute(await getCurrentDestionation());
 };
 

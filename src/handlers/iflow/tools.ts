@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
 	createIflow,
-	deployIflow,
 	getEndpoints,
 	getIflowContentString,
 	getIflowFolder,
@@ -11,13 +10,14 @@ import {
 import { logError, logInfo } from "../..";
 import { getiFlowToImage } from "../../api/iflow/diagram";
 import { McpServerWithMiddleware } from "../../utils/middleware";
+import { deployArtifact, waitAndGetDeployStatus } from "../../api/deployment";
 
-export const updateIflowFiles = z.array(
+export const updateFiles = z.array(
 	z.object({
 		filepath: z
 			.string()
 			.describe(
-				'filepath within project. E.g. "resources/scenarioflows/integrationflow/myiflow.iflw'
+				'filepath within project. E.g. "resources/scenarioflows/integrationflow/myiflow.iflw    Does not have to be an existing file'
 			),
 		content: z.string().describe(`File content.`),
 	})
@@ -111,7 +111,7 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
         `,
 		{
 			id: z.string().describe("ID of the IFLOW"),
-			files: updateIflowFiles,
+			files: updateFiles,
 			autoDeploy: z
 				.boolean()
 				.describe(
@@ -127,7 +127,9 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 				if (autoDeploy) {
 					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
-					await deployIflow(id);
+					const taskId = await deployArtifact(id);
+					const deployStatus = await waitAndGetDeployStatus(taskId);
+					result["deployStatus"] = deployStatus;
 				}
 
 				return {

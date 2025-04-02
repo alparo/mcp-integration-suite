@@ -34,7 +34,6 @@ export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 	});
 
 	logInfo("Fetched token");
-	logInfo(await response.text());
 	logInfo(response.status);
 
 	if (response.status !== 200) {

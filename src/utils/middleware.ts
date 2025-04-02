@@ -1,7 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-type MiddlewareFunction = (next: () => Promise<void>, name: string, params: z.ZodRawShape) => Promise<void>;
+type MiddlewareFunction = (
+	next: () => Promise<void>,
+	name: string,
+	params: z.ZodRawShape
+) => Promise<void>;
 
 export class MiddlewareManager {
 	private middlewares: MiddlewareFunction[] = [];
@@ -24,6 +28,10 @@ export class MiddlewareManager {
 	}
 }
 
+/**
+ * Custom Middleware Server which extends McpServer by a middleware functionality
+ * This is useful for logging atm
+ */
 export class McpServerWithMiddleware extends McpServer {
 	private middlewareManager: MiddlewareManager;
 
@@ -36,6 +44,9 @@ export class McpServerWithMiddleware extends McpServer {
 		this.middlewareManager.use(middleware);
 	}
 
+	/**
+	 * wrapper function for server.tool() to have middleware functionalities
+	 */
 	registerTool(
 		name: string,
 		description: string,

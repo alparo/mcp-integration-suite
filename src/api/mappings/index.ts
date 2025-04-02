@@ -5,8 +5,8 @@ import {
 	messageMappingDesigntimeArtifactSaveAsVersion,
 } from "../../generated/IntegrationContent";
 import { updateFiles } from "../../handlers/iflow/tools";
-import { parseFolder } from "../../utils/fileBasedUtils";
-import { extractToFolder, folderToZipBuffer, patchFile } from "../../utils/zip";
+import { parseFolder, patchFile } from "../../utils/fileBasedUtils";
+import { extractToFolder, folderToZipBuffer } from "../../utils/zip";
 import { getCurrentDestionation, getOAuthToken } from "../api_destination";
 import { z } from "zod";
 import semver from "semver";

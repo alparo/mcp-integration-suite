@@ -69,6 +69,10 @@ export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 	}
 };
 
+/**
+ * Get the API Destination based on .env file
+ * @returns
+ */
 export const getCurrentDestionation =
 	async (): Promise<HttpDestinationOrFetchOptions> => {
 		return {

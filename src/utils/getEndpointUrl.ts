@@ -1,6 +1,9 @@
 import { logInfo } from "..";
 import { ServiceEndpoints } from "../generated/IntegrationContent";
 
+/**
+ * Translate internal CPI Protocol names
+ */
 const cpiProtocolMap: { [protocol: string]: { trailingProtocol: string, URIProtocol: string } } = {
     "REST": {
         trailingProtocol: 'https',
@@ -17,6 +20,11 @@ const cpiProtocolMap: { [protocol: string]: { trailingProtocol: string, URIProto
 
 };
 
+/**
+ * Get Endpoint URL for IFLOWs based on ServiceEndpoints entity
+ * @param ServiceEndpoints from api 
+ * @returns string of the actual URL of the endpoint or empty string
+ */
 export const getEndpointUrl = (endpoint: ServiceEndpoints): string => {
     const endpointIdentifier = endpoint.id.split('=')[1];
 

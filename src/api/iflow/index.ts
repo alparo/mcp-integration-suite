@@ -16,6 +16,11 @@ import { getEndpointUrl } from "../../utils/getEndpointUrl";
 const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
 	integrationContent();
 
+/**
+ * Download IFlow unzipp it and get the folderpath
+ * @param id Iflow Id
+ * @returns Path to extracted IFlow
+ */
 export const getIflowFolder = async (id: string): Promise<string> => {
 	const iflowUrl = await integrationDesigntimeArtifactsApi
 		.requestBuilder()
@@ -39,6 +44,11 @@ export const getIflowFolder = async (id: string): Promise<string> => {
 	return extractToFolder(buf, id);
 };
 
+/**
+ * Create empty Iflow
+ * @param packageId Package ID
+ * @param id ID/Name of Iflow
+ */
 export const createIflow = async (
 	packageId: string,
 	id: string
@@ -57,6 +67,12 @@ export const createIflow = async (
 		.execute(await getCurrentDestionation());
 };
 
+/**
+ * 
+ * @param id iflowId
+ * @param iflowFiles Array of project paths and File content
+ * @returns Status information of the update/Deploy process
+ */
 export const updateIflow = async (
 	id: string,
 	iflowFiles: z.infer<typeof updateFiles>
@@ -113,6 +129,10 @@ export const updateIflow = async (
 	};
 };
 
+/**
+ * Update version number of iflow by 1 patch using semver
+ * @param id iflow Id
+ */
 export const saveAsNewVersion = async (id: string) => {
 	const currentIflow = await integrationDesigntimeArtifactsApi
 		.requestBuilder()
@@ -135,11 +155,21 @@ export const saveAsNewVersion = async (id: string) => {
 	}).execute(await getCurrentDestionation());
 };
 
+/**
+ * Download Iflow extract it to folder and parse all content into one string
+ * @param id iflow Id
+ * @returns One string including all Iflow data
+ */
 export const getIflowContentString = async (id: string): Promise<string> => {
 	const folderPath = await getIflowFolder(id);
 	return parseFolder(folderPath);
 };
 
+/**
+ * Get Service Endpoints of iflow
+ * @param id Iflow Id
+ * @returns serviceEndpoints instances
+ */
 export const getEndpoints = async (id?: string) => {
 	let endpointRequest = serviceEndpointsApi.requestBuilder().getAll();
 

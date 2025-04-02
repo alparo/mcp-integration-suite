@@ -6,7 +6,11 @@ let tokenCache: {
 	expiresAt: number;
 } | null = null;
 
-// TODO: handle CSRF
+/**
+ * Get OAuth token with caching functionality
+ * TODO: add CSRF support 
+ * @returns OAuth2 Token in SAP SDK compatible format
+ */
 export const getOAuthTokenCPI = async (): Promise<DestinationAuthToken> => {
 	// Check if token is expired
 	const now = Date.now();

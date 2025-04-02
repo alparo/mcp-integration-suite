@@ -24,6 +24,10 @@ export class MiddlewareManager {
 	}
 }
 
+/**
+ * Custom Middleware Server which extends McpServer by a middleware functionality
+ * This is useful for logging atm
+ */
 export class McpServerWithMiddleware extends McpServer {
 	private middlewareManager: MiddlewareManager;
 
@@ -36,6 +40,9 @@ export class McpServerWithMiddleware extends McpServer {
 		this.middlewareManager.use(middleware);
 	}
 
+	/**
+	 * wrapper function for server.tool() to have middleware functionalities
+	 */
 	registerTool(
 		name: string,
 		description: string,

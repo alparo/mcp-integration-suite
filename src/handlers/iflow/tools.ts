@@ -12,6 +12,7 @@ import {
 import { logError, logInfo } from "../..";
 import { getEndpointUrl } from "../../utils/getEndpointUrl";
 import { getiFlowToImage } from "../../api/iflow/diagram";
+import { McpServerWithMiddleware } from "../../utils/middleware";
 
 export const updateIflowFiles = z.array(
 	z.object({
@@ -24,7 +25,7 @@ export const updateIflowFiles = z.array(
 	})
 );
 
-export const registerIflowHandlers = (server: McpServer) => {
+export const registerIflowHandlers = (server: McpServerWithMiddleware) => {
 	server.registerTool(
 		"get-iflow",
 		`Get the data of an iflow and the contained ressources. 

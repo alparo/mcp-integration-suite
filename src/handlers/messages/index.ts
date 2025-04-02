@@ -5,8 +5,9 @@ import { getMessages, sendRequestToCPI } from "../../api/messages";
 import { readFileSync } from "fs";
 import { projPath } from "../..";
 import path from "path";
+import { McpServerWithMiddleware } from "../../utils/middleware";
 
-export const registerMessageHandlers = (server: McpServer) => {
+export const registerMessageHandlers = (server: McpServerWithMiddleware) => {
 	server.registerTool(
 		"send-http-message",
 		`

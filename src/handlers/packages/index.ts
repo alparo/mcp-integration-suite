@@ -1,8 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createPackage, getPackage, getPackages } from "../../api/packages";
+import { McpServerWithMiddleware } from "../../utils/middleware";
 
-export const registerPackageHandlers = (server: McpServer) => {
+export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 	server.registerTool(
 		"packages",
 		"Get all integration packages",

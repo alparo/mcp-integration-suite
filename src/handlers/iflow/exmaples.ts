@@ -1,18 +1,20 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+
 import path from "path";
 import { z } from "zod";
 import { parseFolder } from "../../utils/fileBasedUtils";
 import { projPath } from "../..";
 import { availableExamples } from "../../api/iflow/examples";
+import { McpServerWithMiddleware } from "../../utils/middleware";
 
-export const registerIflowExampleHandler = (server: McpServer) => {
+export const registerIflowExampleHandler = (server: McpServerWithMiddleware) => {
 	server.registerTool(
 		"list-iflow-examples",
 		`
 Get a list of available iflow examples.
 You can use these examples to query get-iflow-example
         `,
-		() => {
+		{},
+		async() => {
 			return {
 				content: [
 					{

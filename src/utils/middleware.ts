@@ -1,7 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-type MiddlewareFunction = (next: () => Promise<void>, name: string, params: z.ZodRawShape) => Promise<void>;
+type MiddlewareFunction = (
+	next: () => Promise<void>,
+	name: string,
+	params: z.ZodRawShape
+) => Promise<void>;
 
 export class MiddlewareManager {
 	private middlewares: MiddlewareFunction[] = [];

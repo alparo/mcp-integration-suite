@@ -12,3 +12,5 @@ NodeJs and NPM (Node Version > 20)
 - Message Mapping Examples
 - Check Deployment/Error status
 - Provide default prompt
+- Handle auth problems/test login
+- CSRF implementation

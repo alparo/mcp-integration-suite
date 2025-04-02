@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
-import { sendRequestSchema } from "./types";
-import { sendRequestToCPI } from "../../api/messages";
+import { messageFilterSchema, sendRequestSchema } from "./types";
+import { getMessages, sendRequestToCPI } from "../../api/messages";
 
 export const registerMessageHandlers = (server: McpServer) => {
 	server.tool(
@@ -44,6 +44,26 @@ If not specified otherwise the user probably wants to see the text in response
 					],
 					isError: true,
 				};
+			}
+		}
+	);
+
+	server.tool(
+		"get-messages",
+		`
+Get message processing logs
+This will include information about errors, attachements etc.
+		`,
+		{
+			filterProps: messageFilterSchema,
+		}, 
+		async({ filterProps }) => {
+			const messages = await getMessages(filterProps);
+			return {
+				content: [{
+					type: "text",
+					text: JSON.stringify({messages})
+				}]
 			}
 		}
 	);

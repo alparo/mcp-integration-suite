@@ -5,6 +5,7 @@ let tokenCache: {
 	expiresAt: number;
 } | null = null;
 
+// TODO: handle CSRF
 export const getOAuthTokenCPI = async (): Promise<DestinationAuthToken> => {
     // Check if token is expired
     const now = Date.now();

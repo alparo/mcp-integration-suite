@@ -11,23 +11,17 @@ import {
 	ServiceEndpoints,
 } from "../../generated/IntegrationContent";
 import { logInfo } from "../..";
-import { logExecutionTimeOfAsyncFunc } from "../../utils/performanceTrace";
-import { writeFileSync } from "fs";
 import { parseFolder } from "../../utils/fileBasedUtils";
-import { GetAllRequestBuilder } from "@sap-cloud-sdk/odata-v2";
 import { getEndpointUrl } from "../../utils/getEndpointUrl";
 const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
 	integrationContent();
 
 export const getIflowFolder = async (id: string): Promise<string> => {
-	const iflowUrl = await logExecutionTimeOfAsyncFunc(
-		integrationDesigntimeArtifactsApi
-			.requestBuilder()
-			.getByKey(id, "active")
-			.appendPath("/$value")
-			.url(await getCurrentDestionation()),
-		"get Iflow zip"
-	);
+	const iflowUrl = await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.getByKey(id, "active")
+		.appendPath("/$value")
+		.url(await getCurrentDestionation());
 
 	const authHeader = (await getOAuthToken()).http_header;
 
@@ -70,21 +64,17 @@ export const updateIflow = async (
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
-		await logExecutionTimeOfAsyncFunc(
-			patchFile(iflowPath, file.filepath, file.content),
-			`Patch file ${file.filepath}`
-		);
+		await patchFile(iflowPath, file.filepath, file.content),
+			`Patch file ${file.filepath}`;
 	}
 
 	const iflowBuffer = await folderToZipBuffer(iflowPath);
 
-	const currentIflow = await logExecutionTimeOfAsyncFunc(
-		integrationDesigntimeArtifactsApi
-			.requestBuilder()
-			.getByKey(id, "active")
-			.execute(await getCurrentDestionation()),
-		"get current iflow"
-	);
+	const currentIflow = await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.getByKey(id, "active")
+		.execute(await getCurrentDestionation());
+	
 
 	currentIflow.version = "active";
 
@@ -166,7 +156,9 @@ export const getEndpoints = async (id?: string) => {
 		);
 	}
 
-	logInfo(`Requesting Endpoints on ${await endpointRequest.url(await getCurrentDestionation())}`);
+	logInfo(
+		`Requesting Endpoints on ${await endpointRequest.url(await getCurrentDestionation())}`
+	);
 	const endpoints = await endpointRequest.execute(
 		await getCurrentDestionation()
 	);

@@ -1,4 +1,3 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
 import {
 	createIflow,
@@ -10,7 +9,6 @@ import {
 	updateIflow,
 } from "../../api/iflow";
 import { logError, logInfo } from "../..";
-import { getEndpointUrl } from "../../utils/getEndpointUrl";
 import { getiFlowToImage } from "../../api/iflow/diagram";
 import { McpServerWithMiddleware } from "../../utils/middleware";
 

@@ -3,7 +3,7 @@ import { parseFolder } from "../../utils/fileBasedUtils";
 import { McpServerWithMiddleware } from "../../utils/middleware";
 import { z } from "zod";
 
-export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
+export const registerMappingsExampleHandler = (server: McpServerWithMiddleware) => {
 	server.registerTool(
 		"list-mapping-examples",
 		`Get all available message mapping examples.

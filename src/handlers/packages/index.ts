@@ -1,17 +1,19 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
 import { z } from "zod";
 import { createPackage, getPackage, getPackages } from "../../api/packages";
 import { McpServerWithMiddleware } from "../../utils/middleware";
 
 export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
-	server.registerTool(
-		"packages",
-		"Get all integration packages",
-		{},
-		async () => {
+	server.resource(
+		"available packages",
+		"cpi://packages",
+		async (uri) => {
 			const allPackages = await getPackages();
 			return {
-				content: [{ type: "text", text: JSON.stringify(allPackages) }],
+				contents: [{
+					text: JSON.stringify(allPackages),
+					uri: uri.href
+				}]
 			};
 		}
 	);
@@ -26,7 +28,10 @@ export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 			const packageContent = await getPackage(name);
 			return {
 				content: [
-					{ type: "text", text: JSON.stringify(packageContent) },
+					{ 
+						type: "text", 
+						text: JSON.stringify(packageContent) 
+					}
 				],
 			};
 		}
@@ -50,7 +55,10 @@ export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 			const packageContent = await createPackage(id, name, shortText);
 			return {
 				content: [
-					{ type: "text", text: JSON.stringify(packageContent) },
+					{ 
+						type: "text", 
+						text: JSON.stringify(packageContent) 
+					}
 				],
 			};
 		}

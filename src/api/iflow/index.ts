@@ -19,7 +19,7 @@ import { getEndpointUrl } from "../../utils/getEndpointUrl";
 const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
 	integrationContent();
 
-const getIflowFolder = async (id: string): Promise<string> => {
+export const getIflowFolder = async (id: string): Promise<string> => {
 	const iflowUrl = await logExecutionTimeOfAsyncFunc(
 		integrationDesigntimeArtifactsApi
 			.requestBuilder()

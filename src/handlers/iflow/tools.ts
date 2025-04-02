@@ -5,11 +5,13 @@ import {
 	deployIflow,
 	getEndpoints,
 	getIflowContentString,
+	getIflowFolder,
 	saveAsNewVersion,
 	updateIflow,
 } from "../../api/iflow";
 import { logError, logInfo } from "../..";
 import { getEndpointUrl } from "../../utils/getEndpointUrl";
+import { getiFlowToImage } from "../../api/iflow/diagram";
 
 export const updateIflowFiles = z.array(
 	z.object({
@@ -180,4 +182,21 @@ Get endpoint(s) of iflow and its URLs and Protocols
 			};
 		}
 	);
+
+	server.tool("iflow-image", "Get the iflow logic shown as a image/diagram", {
+		iflowId: z.string().describe("IFlow ID/Name")
+	}, async({ iflowId }) => {
+		const iflowPath = await getIflowFolder(iflowId);
+		logInfo(iflowPath)
+		const pngString = await getiFlowToImage(iflowPath);
+		return {
+			content: [
+				{
+					type: "image",
+					data: pngString, 
+					mimeType: 'image/png'
+				}
+			],
+		};
+	});
 };

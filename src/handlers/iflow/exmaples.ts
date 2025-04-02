@@ -6,7 +6,7 @@ import { projPath } from "../..";
 import { availableExamples } from "../../api/iflow/examples";
 
 export const registerIflowExampleHandler = (server: McpServer) => {
-	server.tool(
+	server.registerTool(
 		"list-iflow-examples",
 		`
 Get a list of available iflow examples.
@@ -24,7 +24,7 @@ You can use these examples to query get-iflow-example
 		}
 	);
 
-	server.tool(
+	server.registerTool(
 		"get-iflow-example",
 		`
 Get an existing iflow as an example to use to create or update other iflows
@@ -50,17 +50,17 @@ Call list-iflow-examples to show available examples
 				};
 			}
 
-            try {
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: await parseFolder(exampleObj._path),
-                        },
-                    ],
-                };
-            } catch (error) {
-                return {
+			try {
+				return {
+					content: [
+						{
+							type: "text",
+							text: await parseFolder(exampleObj._path),
+						},
+					],
+				};
+			} catch (error) {
+				return {
 					content: [
 						{
 							type: "text",
@@ -69,9 +69,7 @@ Call list-iflow-examples to show available examples
 					],
 					isError: true,
 				};
-            }
-
-
+			}
 		}
 	);
 };

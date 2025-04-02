@@ -10,6 +10,7 @@ import { config } from 'dotenv';
 import { exit } from "process";
 import './utils/logging.js';
 import { writeToLog } from "./utils/logging.js";
+import { McpServerWithMiddleware } from './utils/middleware';
 
 process.on('uncaughtException', err => {
 	logError(err);
@@ -18,7 +19,7 @@ process.on('uncaughtException', err => {
 
 config({ path: path.join(projPath, '.env') });
 
-const server = new McpServer({
+const server = new McpServerWithMiddleware({
 	name: "integration-suite",
 	version: "1.0.0",
 	capabilities: {

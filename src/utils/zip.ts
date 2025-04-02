@@ -26,7 +26,7 @@ export const extractToFolder = async(zipBuf: Buffer, id: string): Promise<string
 	return iflowPath;
 };
 
-export const folderToZipBuffer = async (path: string): Promise<Buffer<ArrayBufferLike>> => {
+export const folderToZipBuffer = async (path: string): Promise<Buffer> => {
 	const zip = new AdmZip();
 	logInfo(`Adding ${path} to ZIP archive`);
 	zip.addLocalFolder(path);

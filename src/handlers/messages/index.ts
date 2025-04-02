@@ -7,7 +7,7 @@ import { projPath } from "../..";
 import path from "path";
 
 export const registerMessageHandlers = (server: McpServer) => {
-	server.tool(
+	server.registerTool(
 		"send-http-message",
 		`
 send an HTTP request to integration suite.
@@ -51,7 +51,7 @@ If not specified otherwise the user probably wants to see the text in response
 		}
 	);
 
-	server.tool(
+	server.registerTool(
 		"get-messages",
 		`
 Get message processing logs
@@ -72,5 +72,4 @@ This will include information about errors, attachements etc.
 			};
 		}
 	);
-
 };

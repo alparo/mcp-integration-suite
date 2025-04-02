@@ -25,7 +25,7 @@ export const updateIflowFiles = z.array(
 );
 
 export const registerIflowHandlers = (server: McpServer) => {
-	server.tool(
+	server.registerTool(
 		"get-iflow",
 		`Get the data of an iflow and the contained ressources. 
 Some ressources might relay on other package artefacts which are not included but reffrenced
@@ -65,7 +65,7 @@ Some ressources might relay on other package artefacts which are not included bu
 		}
 	);
 
-	server.tool(
+	server.registerTool(
 		"create-empty-iflow",
 		`Create an empty iflow without functionality. You probably want to add content to it afterwards with tool get-iflow and then update-iflow`,
 		{
@@ -98,7 +98,7 @@ Some ressources might relay on other package artefacts which are not included bu
 		}
 	);
 
-	server.tool(
+	server.registerTool(
 		"update-iflow",
 		`Update or create files/content of an iflow
 You only have to provide files that need to be updated but allways send the full file
@@ -157,7 +157,7 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 		}
 	);
 
-	server.tool(
+	server.registerTool(
 		"get-iflow-endpoints",
 		`
 Get endpoint(s) of iflow and its URLs and Protocols
@@ -166,9 +166,7 @@ Get endpoint(s) of iflow and its URLs and Protocols
 			iflowId: z
 				.string()
 				.optional()
-				.describe(
-					"Iflow ID. By default it will get all endpoints"
-				),
+				.describe("Iflow ID. By default it will get all endpoints"),
 		},
 		async ({ iflowId }) => {
 			const endpoints = await getEndpoints(iflowId);
@@ -176,27 +174,32 @@ Get endpoint(s) of iflow and its URLs and Protocols
 				content: [
 					{
 						type: "text",
-						text: JSON.stringify({type: "success", endpoints}),
+						text: JSON.stringify({ type: "success", endpoints }),
 					},
 				],
 			};
 		}
 	);
 
-	server.tool("iflow-image", "Get the iflow logic shown as a image/diagram", {
-		iflowId: z.string().describe("IFlow ID/Name")
-	}, async({ iflowId }) => {
-		const iflowPath = await getIflowFolder(iflowId);
-		logInfo(iflowPath)
-		const pngString = await getiFlowToImage(iflowPath);
-		return {
-			content: [
-				{
-					type: "image",
-					data: pngString, 
-					mimeType: 'image/png'
-				}
-			],
-		};
-	});
+	server.registerTool(
+		"iflow-image",
+		"Get the iflow logic shown as a image/diagram",
+		{
+			iflowId: z.string().describe("IFlow ID/Name"),
+		},
+		async ({ iflowId }) => {
+			const iflowPath = await getIflowFolder(iflowId);
+			logInfo(iflowPath);
+			const pngString = await getiFlowToImage(iflowPath);
+			return {
+				content: [
+					{
+						type: "image",
+						data: pngString,
+						mimeType: "image/png",
+					},
+				],
+			};
+		}
+	);
 };

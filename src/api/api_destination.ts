@@ -3,6 +3,7 @@ import {
 	retrieveJwt,
 	DestinationAuthToken,
 } from "@sap-cloud-sdk/connectivity";
+import { logError, logInfo } from "..";
 
 // Token cache
 let tokenCache: {
@@ -32,33 +33,40 @@ export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 		body: params,
 	});
 
-	if (!response.ok) {
+	logInfo("Fetched token");
+	logInfo(response.status);
+
+	if (response.status !== 200) {
 		throw new Error(
-			`OAuth Token Fehler: ${response.status} ${response.statusText}`
+			`Error getting OAuth token: ${response.status} ${response.statusText}`
 		);
 	}
 
-	const data = await response.json();
+	try {
+		const data = await response.json();
+		const token = {
+			value: data.access_token,
+			type: data.token_type,
+			expiresIn: data.expires_in,
+			http_header: {
+				key: "Authorization",
+				value: `Bearer ${data.access_token}`,
+			},
+			error: null,
+		};
 
-	// create token
-	const token = {
-		value: data.access_token,
-		type: data.token_type,
-		expiresIn: data.expires_in,
-		http_header: {
-			key: "Authorization",
-			value: `Bearer ${data.access_token}`,
-		},
-		error: null,
-	};
+		tokenCache = {
+			token,
+			expiresAt: now + data.expires_in * 1000,
+		};
 
-	// save token to cache
-	tokenCache = {
-		token,
-		expiresAt: now + data.expires_in * 1000,
-	};
-
-	return token;
+		return token;
+	} catch (error) {
+		logError(JSON.stringify(error));
+		throw new Error(
+			"Invalid response from OAuth authentication URL. Please consider checking your credentials/endpoints"
+		);
+	}
 };
 
 export const getCurrentDestionation =

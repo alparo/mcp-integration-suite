@@ -1,7 +1,7 @@
 import { integrationContent } from "../../generated/IntegrationContent/service";
 import { extractToFolder, folderToZipBuffer, patchFile } from "../../utils/zip";
 import { getCurrentDestionation, getOAuthToken } from "../api_destination";
-import { updateIflowFiles } from "../../handlers/iflow/tools";
+import { updateFiles } from "../../handlers/iflow/tools";
 
 import { z } from "zod";
 import semver from "semver";
@@ -11,23 +11,17 @@ import {
 	ServiceEndpoints,
 } from "../../generated/IntegrationContent";
 import { logInfo } from "../..";
-import { logExecutionTimeOfAsyncFunc } from "../../utils/performanceTrace";
-import { writeFileSync } from "fs";
 import { parseFolder } from "../../utils/fileBasedUtils";
-import { GetAllRequestBuilder } from "@sap-cloud-sdk/odata-v2";
 import { getEndpointUrl } from "../../utils/getEndpointUrl";
 const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
 	integrationContent();
 
 export const getIflowFolder = async (id: string): Promise<string> => {
-	const iflowUrl = await logExecutionTimeOfAsyncFunc(
-		integrationDesigntimeArtifactsApi
-			.requestBuilder()
-			.getByKey(id, "active")
-			.appendPath("/$value")
-			.url(await getCurrentDestionation()),
-		"get Iflow zip"
-	);
+	const iflowUrl = await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.getByKey(id, "active")
+		.appendPath("/$value")
+		.url(await getCurrentDestionation());
 
 	const authHeader = (await getOAuthToken()).http_header;
 
@@ -65,26 +59,20 @@ export const createIflow = async (
 
 export const updateIflow = async (
 	id: string,
-	iflowFiles: z.infer<typeof updateIflowFiles>
-): Promise<string> => {
+	iflowFiles: z.infer<typeof updateFiles>
+): Promise<{ iflowUpdate: { status: number; text: string }, deployStatus?: string }> => {
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
-		await logExecutionTimeOfAsyncFunc(
-			patchFile(iflowPath, file.filepath, file.content),
-			`Patch file ${file.filepath}`
-		);
+		await patchFile(iflowPath, file.filepath, file.content);
 	}
 
 	const iflowBuffer = await folderToZipBuffer(iflowPath);
 
-	const currentIflow = await logExecutionTimeOfAsyncFunc(
-		integrationDesigntimeArtifactsApi
-			.requestBuilder()
-			.getByKey(id, "active")
-			.execute(await getCurrentDestionation()),
-		"get current iflow"
-	);
+	const currentIflow = await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.getByKey(id, "active")
+		.execute(await getCurrentDestionation());
 
 	currentIflow.version = "active";
 
@@ -115,12 +103,14 @@ export const updateIflow = async (
 		method: "PUT",
 	});
 
-	logInfo(iflowResponse.status);
-	logInfo(iflowResponse.statusText);
 	const respText = await iflowResponse.text();
-	logInfo(respText);
 
-	return `${iflowResponse.status} - ${await iflowResponse.text()} - ${respText}`;
+	return {
+		iflowUpdate: {
+			status: iflowResponse.status,
+			text: respText,
+		},
+	};
 };
 
 export const saveAsNewVersion = async (id: string) => {
@@ -145,13 +135,6 @@ export const saveAsNewVersion = async (id: string) => {
 	}).execute(await getCurrentDestionation());
 };
 
-export const deployIflow = async (id: string) => {
-	await deployIntegrationDesigntimeArtifact({
-		id,
-		version: "active",
-	}).execute(await getCurrentDestionation());
-};
-
 export const getIflowContentString = async (id: string): Promise<string> => {
 	const folderPath = await getIflowFolder(id);
 	return parseFolder(folderPath);
@@ -166,7 +149,9 @@ export const getEndpoints = async (id?: string) => {
 		);
 	}
 
-	logInfo(`Requesting Endpoints on ${await endpointRequest.url(await getCurrentDestionation())}`);
+	logInfo(
+		`Requesting Endpoints on ${await endpointRequest.url(await getCurrentDestionation())}`
+	);
 	const endpoints = await endpointRequest.execute(
 		await getCurrentDestionation()
 	);

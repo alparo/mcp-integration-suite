@@ -30,8 +30,7 @@ For Claude Desktop: `~/Library/Application\ Support/Claude/claude_desktop_config
 
 # TODOs
 - CRUD Standalone Message Mappings
-- Message Mapping Examples
 - Check Deployment/Error status
 - Provide default prompt
-- Handle auth problems/test login
 - CSRF implementation
+- Iflow configuration

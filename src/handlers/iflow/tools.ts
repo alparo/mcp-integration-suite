@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
 	createIflow,
+	deployIflow,
 	getEndpoints,
 	getIflowContentString,
 	getIflowFolder,
@@ -10,7 +11,11 @@ import {
 import { logError, logInfo } from "../..";
 import { getiFlowToImage } from "../../api/iflow/diagram";
 import { McpServerWithMiddleware } from "../../utils/middleware";
-import { deployArtifact, waitAndGetDeployStatus } from "../../api/deployment";
+import {
+	getDeploymentErrorReason,
+	waitAndGetDeployStatus,
+} from "../../api/deployment";
+import { formatError } from "../../utils/customErrHandler";
 
 export const updateFiles = z.array(
 	z.object({
@@ -34,9 +39,9 @@ Some ressources might relay on other package artefacts which are not included bu
 		},
 		async ({ id }) => {
 			logInfo(`trying to get iflow ${id}`);
+
 			try {
 				const fileContent = await getIflowContentString(id);
-				//const escapedFileContent = escapeDoublequotes(fileContent);
 
 				return {
 					content: [
@@ -52,13 +57,8 @@ Some ressources might relay on other package artefacts which are not included bu
 			} catch (error) {
 				logError(error);
 				return {
-					content: [
-						{
-							type: "text",
-							text: JSON.stringify({ type: "error", error }),
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -83,15 +83,9 @@ Some ressources might relay on other package artefacts which are not included bu
 					],
 				};
 			} catch (error) {
-				logError(error);
 				return {
-					content: [
-						{
-							type: "text",
-							text: JSON.stringify({ type: "error", error }),
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -127,7 +121,7 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 				if (autoDeploy) {
 					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
-					const taskId = await deployArtifact(id);
+					const taskId = await deployIflow(id);
 					const deployStatus = await waitAndGetDeployStatus(taskId);
 					result["deployStatus"] = deployStatus;
 				}
@@ -144,15 +138,9 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 					],
 				};
 			} catch (error) {
-				logError(error);
 				return {
-					content: [
-						{
-							type: "text",
-							text: `Error: Could not update`,
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -170,15 +158,25 @@ Get endpoint(s) of iflow and its URLs and Protocols
 				.describe("Iflow ID. By default it will get all endpoints"),
 		},
 		async ({ iflowId }) => {
-			const endpoints = await getEndpoints(iflowId);
-			return {
-				content: [
-					{
-						type: "text",
-						text: JSON.stringify({ type: "success", endpoints }),
-					},
-				],
-			};
+			try {
+				const endpoints = await getEndpoints(iflowId);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({
+								type: "success",
+								endpoints,
+							}),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 
@@ -201,6 +199,68 @@ Get endpoint(s) of iflow and its URLs and Protocols
 					},
 				],
 			};
+		}
+	);
+
+	server.registerTool(
+		"get-deploy-error",
+		`
+If you tried to deploy an Artifact like Iflow or mapping and got an error use this too to get the error message and context
+If the response is empty it means there is no deployment error and it was successful
+`,
+		{
+			id: z
+				.string()
+				.describe(
+					"Artifact ID, can be iflow name or message mapping name etc."
+				),
+		},
+		async ({ id }) => {
+			try {
+				const errorReason = await getDeploymentErrorReason(id);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify(errorReason),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
+		}
+	);
+
+	server.registerTool(
+		"deploy-iflow",
+		`
+deploy a iflow
+If the deployment status is unsuccessful try getting information from get-deploy-error
+		`,
+		{ iflowId: z.string().describe("ID/Name of iflow") },
+
+		async ({ iflowId }) => {
+			try {
+				const taskId = await deployIflow(iflowId);
+				const deployStatus = await waitAndGetDeployStatus(taskId);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({ deployStatus }),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 };

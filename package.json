@@ -17,7 +17,7 @@
         "build": "npm run build:generateclient && npm run build:tsc",
         "start": "node dist/server.js",
         "dev": "npm run build:tsc && npm run dev:inspector",
-        "dev:inspector": "npx @modelcontextprotocol/inspector node",
+        "dev:inspector": "npx @modelcontextprotocol/inspector node ./dist/index.js",
         "test": "npm run build && node dist/test.js",
         "watch": "npm-watch dev",
         "watch:log": "tail -n 20 -F ~/Library/Logs/Claude/mcp-server-mcp-integration-suite.log"
@@ -30,6 +30,7 @@
         "@sap-cloud-sdk/temporal-de-serializers": "^3.26.4",
         "@sap-cloud-sdk/test-util": "^3.26.4",
         "adm-zip": "^0.5.16",
+        "axios": "^1.8.4",
         "dotenv": "^16.4.7",
         "glob": "^11.0.1",
         "mcps-logger": "^1.0.0-rc.4",

@@ -3,7 +3,7 @@
 A ModelContextProtocol (MCP) Server for SAP Integration Suite.
 
 ## Requirements
-NodeJs and NPM (Node Version > 20)
+NodeJs and NPM (Node Version > 21 because of native NodeJS fetch)
 
 ## Installation
 ```sh

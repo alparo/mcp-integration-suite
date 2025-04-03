@@ -6,6 +6,7 @@ import { readFileSync } from "fs";
 import { projPath } from "../..";
 import path from "path";
 import { McpServerWithMiddleware } from "../../utils/middleware";
+import { formatError } from "../../utils/customErrHandler";
 
 export const registerMessageHandlers = (server: McpServerWithMiddleware) => {
 	server.registerTool(
@@ -38,15 +39,8 @@ If not specified otherwise the user probably wants to see the text in response
 				};
 			} catch (error) {
 				return {
-					content: [
-						{
-							type: "text",
-							text:
-								"Error executing request: " +
-								JSON.stringify(error),
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -62,15 +56,22 @@ This will include information about errors, attachements etc.
 			filterProps: messageFilterSchema,
 		},
 		async ({ filterProps }) => {
-			const messages = await getMessages(filterProps);
-			return {
-				content: [
-					{
-						type: "text",
-						text: JSON.stringify({ messages }),
-					},
-				],
-			};
+			try {
+				const messages = await getMessages(filterProps);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({ messages }),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 };

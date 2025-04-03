@@ -21,32 +21,21 @@ export const getMessageMappingContentString = async (
 };
 
 export const getMessageMappingFolder = async (id: string): Promise<string> => {
-	const messagemappingUrl = await messageMappingDesigntimeArtifactsApi
+	const arrBuffer = await messageMappingDesigntimeArtifactsApi
 		.requestBuilder()
 		.getByKey(id, "active")
 		.appendPath("/$value")
-		.url(await getCurrentDestionation());
+		.addCustomRequestConfiguration({ responseType: "arraybuffer" })
+		.executeRaw(await getCurrentDestionation());
 
-	const authHeader = (await getOAuthToken()).http_header;
-
-	// Use fetch instead of built in axios because it is trash
-	const messagemappingResponse = await fetch(messagemappingUrl, {
-		headers: { [authHeader.key]: authHeader.value },
-	});
-
-	if (messagemappingResponse.status !== 200) {
-		throw new Error("Error while downloading messagemapping ZIP");
-	}
-	const arrBuffer = await messagemappingResponse.arrayBuffer();
-
-	const buf = Buffer.from(arrBuffer);
+	const buf = Buffer.from(arrBuffer.data);
 	return extractToFolder(buf, id);
 };
 
 export const updateMessageMapping = async (
 	id: string,
 	messagemappingFiles: z.infer<typeof updateFiles>
-): Promise<string> => {
+) => {
 	const messagemappingPath = await getMessageMappingFolder(id);
 
 	for (const file of messagemappingFiles) {
@@ -60,41 +49,21 @@ export const updateMessageMapping = async (
 		.getByKey(id, "active")
 		.execute(await getCurrentDestionation());
 
-	currentMessageMapping.version = "active";
+	currentMessageMapping.artifactContent =
+		messagemappingBuffer.toString("base64");
 
-	const requestURI = await messageMappingDesigntimeArtifactsApi
+	await messageMappingDesigntimeArtifactsApi
 		.requestBuilder()
 		.update(currentMessageMapping)
-		.url(await getCurrentDestionation());
+		.replaceWholeEntityWithPut()
+		.executeRaw(await getCurrentDestionation());
 
-	logInfo(`Request URI: ${requestURI}`);
-
-	const newMessageMappingObj = {
-		Name: id,
-		ArtifactContent: messagemappingBuffer.toString("base64"),
-	};
-
-	const reqBody = JSON.stringify(newMessageMappingObj);
-	logInfo(reqBody);
-
-	const authHeader = (await getOAuthToken()).http_header;
-
-	// Use fetch instead of built in axios because it is trash
-	const messagemappingResponse = await fetch(requestURI, {
-		headers: {
-			[authHeader.key]: authHeader.value,
-			"Content-Type": "application/json",
+	return {
+		messageMappingUpdate: {
+			status: 200,
+			text: "successfully updated",
 		},
-		body: reqBody,
-		method: "PUT",
-	});
-
-	logInfo(messagemappingResponse.status);
-	logInfo(messagemappingResponse.statusText);
-	const respText = await messagemappingResponse.text();
-	logInfo(respText);
-
-	return `${messagemappingResponse.status} - ${await messagemappingResponse.text()} - ${respText}`;
+	};
 };
 
 export const saveAsNewVersion = async (id: string) => {

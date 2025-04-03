@@ -22,23 +22,14 @@ const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
  * @returns Path to extracted IFlow
  */
 export const getIflowFolder = async (id: string): Promise<string> => {
-	const iflowUrl = await integrationDesigntimeArtifactsApi
+	const iflowBuffer = await integrationDesigntimeArtifactsApi
 		.requestBuilder()
 		.getByKey(id, "active")
 		.appendPath("/$value")
-		.url(await getCurrentDestionation());
+		.addCustomRequestConfiguration({ responseType: "arraybuffer" })
+		.executeRaw(await getCurrentDestionation());
 
-	const authHeader = (await getOAuthToken()).http_header;
-
-	// Use fetch instead of built in axios because it is trash
-	const iflowResponse = await fetch(iflowUrl, {
-		headers: { [authHeader.key]: authHeader.value },
-	});
-
-	if (iflowResponse.status !== 200) {
-		throw new Error("Error while downloading iflow ZIP");
-	}
-	const arrBuffer = await iflowResponse.arrayBuffer();
+	const arrBuffer = await iflowBuffer.data;
 
 	const buf = Buffer.from(arrBuffer);
 	return extractToFolder(buf, id);
@@ -68,7 +59,7 @@ export const createIflow = async (
 };
 
 /**
- * 
+ *
  * @param id iflowId
  * @param iflowFiles Array of project paths and File content
  * @returns Status information of the update/Deploy process
@@ -76,7 +67,10 @@ export const createIflow = async (
 export const updateIflow = async (
 	id: string,
 	iflowFiles: z.infer<typeof updateFiles>
-): Promise<{ iflowUpdate: { status: number; text: string }, deployStatus?: string }> => {
+): Promise<{
+	iflowUpdate: { status: number; text: string };
+	deployStatus?: string;
+}> => {
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
@@ -90,41 +84,18 @@ export const updateIflow = async (
 		.getByKey(id, "active")
 		.execute(await getCurrentDestionation());
 
-	currentIflow.version = "active";
+	currentIflow.artifactContent = iflowBuffer.toString("base64");
 
-	const requestURI = await integrationDesigntimeArtifactsApi
+	await integrationDesigntimeArtifactsApi
 		.requestBuilder()
 		.update(currentIflow)
-		.url(await getCurrentDestionation());
-
-	logInfo(`Request URI: ${requestURI}`);
-
-	const newIflowObj = {
-		Name: id,
-		ArtifactContent: iflowBuffer.toString("base64"),
-	};
-
-	const reqBody = JSON.stringify(newIflowObj);
-	logInfo(reqBody);
-
-	const authHeader = (await getOAuthToken()).http_header;
-
-	// Use fetch instead of built in axios because it is trash
-	const iflowResponse = await fetch(requestURI, {
-		headers: {
-			[authHeader.key]: authHeader.value,
-			"Content-Type": "application/json",
-		},
-		body: reqBody,
-		method: "PUT",
-	});
-
-	const respText = await iflowResponse.text();
+		.replaceWholeEntityWithPut()
+		.execute(await getCurrentDestionation());
 
 	return {
 		iflowUpdate: {
-			status: iflowResponse.status,
-			text: respText,
+			status: 200,
+			text: "successfully updated",
 		},
 	};
 };

@@ -1,18 +1,20 @@
 import axios, { AxiosError } from "axios";
 import { contentReturnElement } from "./middleware";
+import { logError } from "..";
 
-export const formatError = (error: unknown): contentReturnElement => {
+export const formatError = (error: any): contentReturnElement => {
+	logError(error);
 	if (error === null) {
 		return {
 			type: "text",
 			text: "Received a null error! This should never happen. Consider checking server logs",
 		};
 	}
-	if (axios.isAxiosError(error)) {
-		error as AxiosError;
+	if (axios.isAxiosError(error?.cause)) {
+		const axiosError = error.cause as AxiosError;
 		//here we have a type guard check, error inside this if will be treated as AxiosError
-		const response = error?.response;
-		const request = error?.request;
+		const response = axiosError?.response;
+		const request = axiosError?.request;
 
 		if (response) {
 			//The request was made and the server responded with a status code that falls out of the range of 2xx the http status code mentioned above
@@ -31,14 +33,14 @@ export const formatError = (error: unknown): contentReturnElement => {
 				type: "text",
 				text: JSON.stringify({
 					type: "error creating request",
-					request,
+					text: { URI: request.path, method: request.method },
 				}),
 			};
 		}
 	} else {
 		return {
 			type: "text",
-			text: JSON.stringify({ error }),
+			text: JSON.stringify({ error: error.toString() }),
 		};
 	}
 };

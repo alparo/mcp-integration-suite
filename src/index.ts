@@ -1,22 +1,22 @@
 // First call so the imports can use the variable
-import path from 'path';
-export const projPath = path.resolve(__dirname, '..');
+import path from "path";
+export const projPath = path.resolve(__dirname, "..");
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerAllHandlers } from "./handlers";
-import { config } from 'dotenv';
+import { config } from "dotenv";
 
 import { exit } from "process";
-import './utils/logging.js';
+import "./utils/logging.js";
 import { writeToLog } from "./utils/logging.js";
-import { McpServerWithMiddleware } from './utils/middleware';
+import { McpServerWithMiddleware } from "./utils/middleware";
 
-process.on('uncaughtException', err => {
+process.on("uncaughtException", (err) => {
 	logError(err);
 	exit(2);
 });
 
-config({ path: path.join(projPath, '.env') });
+config({ path: path.join(projPath, ".env") });
 
 const server = new McpServerWithMiddleware({
 	name: "integration-suite",
@@ -31,7 +31,7 @@ registerAllHandlers(server);
 
 async function main() {
 	const transport = new StdioServerTransport();
-	
+
 	await server.connect(transport);
 }
 
@@ -40,24 +40,20 @@ export const logError = (msg: any): void => {
 	try {
 		// just causes lots of error messages on most client because it is not implemented
 		//server.server.sendLoggingMessage({level: "error", data: JSON.stringify(msg)});
-	} catch {
-		
-	}
-	
-}
+	} catch {}
+};
 
 export const logInfo = (msg: any): void => {
 	writeToLog(msg);
 	try {
 		//server.server.sendLoggingMessage({level: "info", data: JSON.stringify(msg)});
-	} catch {
-		
-	}
-	
-}
+	} catch {}
+};
 
-main().catch(err => {
-	logError(err);
-	console.error(err);
-	exit(1);
-}).then(() => writeToLog("server started"));
+main()
+	.catch((err) => {
+		logError(err);
+		console.error(err);
+		exit(1);
+	})
+	.then(() => writeToLog("server started"));

@@ -39,9 +39,9 @@ Some ressources might relay on other package artefacts which are not included bu
 		},
 		async ({ id }) => {
 			logInfo(`trying to get iflow ${id}`);
+
 			try {
 				const fileContent = await getIflowContentString(id);
-				//const escapedFileContent = escapeDoublequotes(fileContent);
 
 				return {
 					content: [

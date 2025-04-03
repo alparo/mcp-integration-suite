@@ -44,17 +44,14 @@ export const updateMessageMapping = async (
 
 	const messagemappingBuffer = await folderToZipBuffer(messagemappingPath);
 
-	const currentMessageMapping = await messageMappingDesigntimeArtifactsApi
-		.requestBuilder()
-		.getByKey(id, "active")
-		.execute(await getCurrentDestionation());
-
-	currentMessageMapping.artifactContent =
-		messagemappingBuffer.toString("base64");
-
+	const newIflowEntity = messageMappingDesigntimeArtifactsApi.entityBuilder().fromJson({
+		version: 'active',
+		id,
+		artifactContent: messagemappingBuffer.toString("base64")
+	});
 	await messageMappingDesigntimeArtifactsApi
 		.requestBuilder()
-		.update(currentMessageMapping)
+		.update(newIflowEntity)
 		.replaceWholeEntityWithPut()
 		.executeRaw(await getCurrentDestionation());
 

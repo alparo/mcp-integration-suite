@@ -79,12 +79,6 @@ export const updateIflow = async (
 
 	const iflowBuffer = await folderToZipBuffer(iflowPath);
 
-	const currentIflow = await integrationDesigntimeArtifactsApi
-		.requestBuilder()
-		.getByKey(id, "active")
-		.execute(await getCurrentDestionation());
-
-
 	const newIflowEntity = integrationDesigntimeArtifactsApi.entityBuilder().fromJson({
 		version: 'active',
 		id,

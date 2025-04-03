@@ -3,7 +3,7 @@ import {
 	messageFilterSchema,
 	sendRequestSchema,
 } from "../../handlers/messages/types";
-import { logInfo } from "../..";
+import { logInfo, projPath } from "../..";
 import { getOAuthTokenCPI } from "../cpi_auth";
 import {
 	MessageProcessingLogs,
@@ -13,11 +13,17 @@ import { DeSerializers, or } from "@sap-cloud-sdk/odata-v2";
 import { and, Filter, FilterList } from "@sap-cloud-sdk/odata-common";
 import moment, { Moment } from "moment";
 import { getCurrentDestionation } from "../api_destination";
+import { createIflow } from "../iflow";
+import { integrationContent } from "../../generated/IntegrationContent";
+import { folderToZipBuffer } from "../../utils/zip";
+import path from "path";
 
 const { messageProcessingLogsApi, messageProcessingLogAttachmentsApi } =
 	messageProcessingLogs();
 
 const errStatus = ["RETRY", "FAILED", "ABANDONED", "ESCALATED", "DISCARDED"];
+
+const { integrationDesigntimeArtifactsApi } = integrationContent();
 
 export const sendRequestToCPI = async (
 	path: z.infer<typeof sendRequestSchema.path>,
@@ -117,7 +123,7 @@ export const getMessages = async (
 ): Promise<
 	(MessageProcessingLogs & {
 		ErrorInformationValue?: string;
-		messageAttachementFiles?: { description?: string, data: string }[];
+		messageAttachementFiles?: { description?: string; data: string }[];
 	})[]
 > => {
 	const messageBaseReq = messageProcessingLogsApi
@@ -131,9 +137,8 @@ export const getMessages = async (
 	logInfo(await messageBaseReq.url(await getCurrentDestionation()));
 
 	const messageWithErrVal: (MessageProcessingLogs & {
-		ErrorInformationValue?: string;		
-		messageAttachementFiles?: { description?: string, data: string }[];
-
+		ErrorInformationValue?: string;
+		messageAttachementFiles?: { description?: string; data: string }[];
 	})[] = await messageBaseReq.execute(await getCurrentDestionation());
 
 	logInfo(`Found ${messageWithErrVal.length} messages`);
@@ -178,7 +183,9 @@ export const getMessages = async (
 						.executeRaw(await getCurrentDestionation())
 				).data.d.results;
 
-				logInfo(`Found ${message.attachments.length} attachements for ${message.messageGuid}`)
+				logInfo(
+					`Found ${message.attachments.length} attachements for ${message.messageGuid}`
+				);
 
 				message.messageAttachementFiles = [];
 
@@ -186,16 +193,22 @@ export const getMessages = async (
 					message.messageAttachementFiles?.push({
 						description: attachement.name as string,
 						// TS ignore because SAP specification is not what they actually provide
-						// @ts-ignore 
-						data: await getMessageMedia(attachement["Id"] as string)
+						
+						data: await getMessageMedia(
+							// @ts-ignore
+							attachement["Id"] as string
+						),
 					});
 				}
 			} catch (error) {
 				logInfo(`Could not get Attachments for ${message.messageGuid}`);
-				logInfo(await messageProcessingLogsApi
-					.requestBuilder()
-					.getByKey(message.messageGuid)
-					.appendPath("/Attachments").url(await getCurrentDestionation()));
+				logInfo(
+					await messageProcessingLogsApi
+						.requestBuilder()
+						.getByKey(message.messageGuid)
+						.appendPath("/Attachments")
+						.url(await getCurrentDestionation())
+				);
 				logInfo(error);
 			}
 
@@ -233,10 +246,31 @@ export const getMessages = async (
 export const getMessageMedia = async (mediaId: string): Promise<string> => {
 	logInfo(`Getting file ${mediaId}`);
 
-	return (await messageProcessingLogAttachmentsApi
+	return (
+		await messageProcessingLogAttachmentsApi
 			.requestBuilder()
 			.getByKey(mediaId)
 			.appendPath("/$value")
 			.executeRaw(await getCurrentDestionation())
 	).data;
+};
+
+export const createMappingTestIflow = async (pkgId: string) => {
+	const iflowBuffer = await folderToZipBuffer(
+		path.resolve(projPath, "resources", "helpers", "if_echo_mapping")
+	);
+
+	const newIflow = integrationDesigntimeArtifactsApi
+		.entityBuilder()
+		.fromJson({
+			id: "if_echo_mapping",
+			name: "if_echo_mapping",
+			packageId: pkgId,
+			artifactContent: iflowBuffer.toString("base64"),
+		});
+
+	await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.create(newIflow)
+		.execute(await getCurrentDestionation());
 };

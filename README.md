@@ -31,4 +31,4 @@ For Claude Desktop: `~/Library/Application\ Support/Claude/claude_desktop_config
 # TODOs
 - Provide default prompt
 - CSRF implementation
-- more auth methods
+- Test Message mappings

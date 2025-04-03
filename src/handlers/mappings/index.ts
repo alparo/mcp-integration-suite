@@ -12,6 +12,7 @@ import { z } from "zod";
 import { updateFiles } from "../iflow/tools";
 import { waitAndGetDeployStatus } from "../../api/deployment";
 import { formatError } from "../../utils/customErrHandler";
+import { createMappingTestIflow } from "../../api/messages";
 
 export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 	server.registerTool(
@@ -185,6 +186,44 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 							type: "text",
 							text: JSON.stringify({
 								messageMappings: await getAllMessageMappings(),
+							}),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
+		}
+	);
+
+	server.registerTool(
+		"create-mapping-testiflow",
+		`Creates an iflow called if_echo_mapping
+This iflow can be used to test mappings, it returns the content after mapping.
+You might want to check if the iflow already exists before creating it.
+To test a mapping use the usual update procedure but replace the current mapping and datatypes with yours
+The endpoint can also be found using the regular endpoint finding procedure`,
+		{
+			pkgId: z
+				.string()
+				.describe("Package in which the iflow should get created"),
+		},
+		async ({ pkgId }) => {
+			try {
+				await createMappingTestIflow(pkgId);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({
+								status: "SUCCESS",
+								message: `iflow if_echo_mapping created.
+							You can now go on by applying your message mapping to the iflow.
+							To send a test message use the get get-iflow-endpoints tool and then the send-http-message to send test messages
+							Don't forget to deploy tho`,
 							}),
 						},
 					],

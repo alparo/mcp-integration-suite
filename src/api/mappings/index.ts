@@ -111,3 +111,21 @@ export const deployMapping = async (id: string): Promise<string> => {
 	logInfo(`got TaskId ${deployRes.data} for deployment of ${id}`);
 	return deployRes.data;
 };
+
+export const createMessageMapping = async (
+	packageId: string,
+	id: string
+): Promise<void> => {
+	const newMessageMapping = messageMappingDesigntimeArtifactsApi
+		.entityBuilder()
+		.fromJson({
+			id,
+			name: id,
+			packageId,
+		});
+
+	await messageMappingDesigntimeArtifactsApi
+		.requestBuilder()
+		.create(newMessageMapping)
+		.execute(await getCurrentDestionation());
+};

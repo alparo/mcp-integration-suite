@@ -7,6 +7,7 @@ import { registerMessageHandlers } from "./messages";
 import { McpServerWithMiddleware } from "../utils/middleware";
 import { logError, logInfo } from "..";
 import { registerMappingsHandler } from "./mappings";
+import { registerMappingsExampleHandler } from "./mappings/examples";
 
 const registerDefaultMiddleware = (server: McpServerWithMiddleware) => {
 	server.use(async(next, name, params) => {
@@ -28,5 +29,6 @@ export const registerAllHandlers = (server: McpServerWithMiddleware) => {
 	registerIflowExampleHandler(server);
 	registerMessageHandlers(server);
 	registerMappingsHandler(server);
+	registerMappingsExampleHandler(server);
 };
 

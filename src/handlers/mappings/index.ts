@@ -31,7 +31,7 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 							type: "text",
 							text: JSON.stringify({
 								type: "success",
-								iflowContent: fileContent,
+								messageMappingContent: fileContent,
 							}),
 						},
 					],

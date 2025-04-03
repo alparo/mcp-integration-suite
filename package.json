@@ -3,14 +3,6 @@
     "version": "1.0.0",
     "description": "MCP Server für Integration Package Management",
     "main": "dist/server.js",
-    "watch": {
-        "dev": {
-            "patterns": [
-                "src"
-            ],
-            "extensions": "ts"
-        }
-    },
     "scripts": {
         "build:generateclient": "node src/scripts/buildOdataClient.js",
         "build:tsc": "tsc -p tsconfig.json",
@@ -19,7 +11,6 @@
         "dev": "npm run build:tsc && npm run dev:inspector",
         "dev:inspector": "npx @modelcontextprotocol/inspector node ./dist/index.js",
         "test": "npm run build && node dist/test.js",
-        "watch": "npm-watch dev",
         "watch:log": "tail -n 20 -F ~/Library/Logs/Claude/mcp-server-mcp-integration-suite.log"
     },
     "dependencies": {
@@ -33,12 +24,9 @@
         "axios": "^1.8.4",
         "dotenv": "^16.4.7",
         "glob": "^11.0.1",
-        "mcps-logger": "^1.0.0-rc.4",
-        "moment": "^2.30.1",
         "puppeteer": "^24.5.0",
         "rimraf": "^6.0.1",
         "semver": "^7.7.1",
-        "zip-a-folder": "^3.1.9",
         "zod": "^3.20.0"
     },
     "devDependencies": {
@@ -47,7 +35,6 @@
         "@types/node": "^18.15.0",
         "@types/puppeteer": "^5.4.7",
         "@types/semver": "^7.7.0",
-        "npm-watch": "^0.13.0",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.0.0"
     }

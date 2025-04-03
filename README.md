@@ -31,6 +31,4 @@ For Claude Desktop: `~/Library/Application\ Support/Claude/claude_desktop_config
 # TODOs
 - Provide default prompt
 - CSRF implementation
-- Iflow configuration
 - more auth methods
-- list artifacts

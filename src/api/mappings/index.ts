@@ -43,7 +43,12 @@ export const updateMessageMapping = async (
 	const messagemappingPath = await getMessageMappingFolder(id);
 
 	for (const file of messagemappingFiles) {
-		await patchFile(messagemappingPath, file.filepath, file.content, file.appendMode);
+		await patchFile(
+			messagemappingPath,
+			file.filepath,
+			file.content,
+			file.appendMode
+		);
 	}
 
 	const messagemappingBuffer = await folderToZipBuffer(messagemappingPath);
@@ -147,3 +152,9 @@ export const createMessageMapping = async (
 		.create(newMessageMapping)
 		.execute(await getCurrentDestionation());
 };
+
+export const getAllMessageMappings = async () =>
+	messageMappingDesigntimeArtifactsApi
+		.requestBuilder()
+		.getAll()
+		.execute(await getCurrentDestionation());

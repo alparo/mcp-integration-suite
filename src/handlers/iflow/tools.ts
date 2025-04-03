@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
 	createIflow,
 	deployIflow,
+	getAllIflowsByPackage,
 	getEndpoints,
 	getIflowConfiguration,
 	getIflowContentString,
@@ -284,7 +285,6 @@ Not every iflow is using configurations tho. most of the time configuration is m
 		async ({ iflowId }) => {
 			try {
 				const configurations = await getIflowConfiguration(iflowId);
-				
 
 				return {
 					content: [
@@ -305,4 +305,30 @@ Not every iflow is using configurations tho. most of the time configuration is m
 		}
 	);
 
+	server.registerTool(
+		"get-all-iflows",
+		`Get a list of all available iflows in a Package
+If the user asks for all iflows, get all packages first and then query for each package`,
+		{
+			pkgId: z.string().describe("Package id"),
+		},
+		async ({ pkgId }) => {
+			try {
+				const allIFs = await getAllIflowsByPackage(pkgId);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({ iflows: allIFs }),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
+		}
+	);
 };

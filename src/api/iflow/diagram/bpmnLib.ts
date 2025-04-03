@@ -38,8 +38,6 @@ async function printDiagram(page: puppeteer.Page, options: DiagramOptions): Prom
 
   await page.goto(`file://${path.join(projPath, 'resources', 'Diagram', 'skeleton.html')}`);
 
-  console.log(__dirname)
-
   const desiredViewport = await page.evaluate(async function(diagramXML: string, options: any): Promise<ViewportDimensions> {
     const {
       ...openOptions

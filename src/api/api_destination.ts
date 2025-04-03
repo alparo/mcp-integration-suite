@@ -2,6 +2,7 @@ import {
 	HttpDestinationOrFetchOptions,
 	retrieveJwt,
 	DestinationAuthToken,
+	AuthenticationType,
 } from "@sap-cloud-sdk/connectivity";
 import { logError, logInfo } from "..";
 
@@ -69,16 +70,55 @@ export const getOAuthToken = async (): Promise<DestinationAuthToken> => {
 	}
 };
 
+const isOAuthPresent = () =>
+	process.env.API_OAUTH_CLIENT_ID &&
+	process.env.API_OAUTH_CLIENT_SECRET &&
+	process.env.API_OAUTH_TOKEN_URL
+	? true
+	: false;
+
+const isBasicCredPresent = () => process.env.API_USER && process.env.API_PASS ? true : false;
+
 /**
  * Get the API Destination based on .env file
  * @returns
  */
 export const getCurrentDestionation =
 	async (): Promise<HttpDestinationOrFetchOptions> => {
-		return {
-			authentication: "OAuth2ClientCredentials",
-			isTrustingAllCertificates: false,
-			url: process.env.API_BASE_URL as string,
-			authTokens: [await getOAuthToken()],
-		};
+		if (!process.env.API_BASE_URL) {
+			throw new Error("No API Url provided in project .env file");
+		}
+
+		// check if either API basic credentials or oauth client-credentials is present in full
+		if (!isBasicCredPresent() && !isOAuthPresent()) {
+			throw new Error(
+				"No Authentication method provided in project .env file"
+			);
+		}
+
+		if  (isOAuthPresent()) return getOAuthConfig();
+
+		if (isBasicCredPresent()) return getBasicAuthConfig();
+
+		throw new Error("Error setting up Authentication. Please check .env");
+		
 	};
+
+const getOAuthConfig = async (): Promise<HttpDestinationOrFetchOptions> => {
+	return {
+		authentication: "OAuth2ClientCredentials" as AuthenticationType,
+		isTrustingAllCertificates: false,
+		url: process.env.API_BASE_URL as string,
+		authTokens: [await getOAuthToken()],
+	};
+};
+
+const getBasicAuthConfig = async(): Promise<HttpDestinationOrFetchOptions> => {
+	return {
+		authentication: "BasicAuthentication" as AuthenticationType,
+		username: process.env.API_USER,
+		password: process.env.API_PASS,
+		isTrustingAllCertificates: false,
+		url: process.env.API_BASE_URL as string,
+	}
+}

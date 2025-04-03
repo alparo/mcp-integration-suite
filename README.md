@@ -28,7 +28,15 @@ For Claude Desktop: `~/Library/Application\ Support/Claude/claude_desktop_config
 }
 ```
 
-# TODOs
+## Custom Prompt
+```
+# Instructions for tool mcp-integration-suite
+This server provides tools for interacting with an SAP Integration Suite via API. Sometimes also called SAP CPI
+
+
+```
+
+## TODOs
 - Provide default prompt
 - CSRF implementation
 - Test Message mappings

@@ -104,6 +104,13 @@ Some ressources might relay on other package artefacts which are not included bu
 		"update-iflow",
 		`Update or create files/content of an iflow
 You only have to provide files that need to be updated but allways send the full file
+
+If you encounter prolems updating/deploying iflows consider taking a look at the available templates where you can learn from
+Templates for complex iflows and message mappings are avialagle
+
+Iflows can contain message mappings, datatypes (XSDs) and scripts
+Message mappings can also be standalone objects, but most of the time will be featured within an iflow
+
 Make sure you ONLY change the things the user instructs you to and keep all other things
 Folder structure is like this:
 src/main/resources/ is the root
@@ -216,6 +223,8 @@ Get endpoint(s) of iflow and its URLs and Protocols
 		`
 If you tried to deploy an Artifact like Iflow or mapping and got an error use this too to get the error message and context
 If the response is empty it means there is no deployment error and it was successful
+
+If you have errors consider checking the available examples to resolve them
 `,
 		{
 			id: z

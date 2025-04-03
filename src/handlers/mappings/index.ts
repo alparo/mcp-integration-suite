@@ -60,7 +60,7 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
     You only have to provide files that need to be updated but allways send the full file
     Make sure you ONLY change the things the user instructs you to and keep all other things
 
-	
+	If you encounter problems updating/deploying mappings consider looking at the available examples
 
     Folder structure is like this:
     src/main/resources/ is the root
@@ -149,7 +149,8 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 
 	server.registerTool(
 		"create-empty-mapping",
-		`Create an empty message mapping without functionality. You probably want to add content to it afterwards with tool get-mapping and then update-mapping`,
+		`Create an empty message mapping without functionality. You probably want to add content to it afterwards with tool get-mapping and then update-mapping
+		Be aware that most of the time you don't need to create an extra mapping. Most scenarios have a mapping within the iflow. Consider looking at iflow examples`,
 		{
 			packageId: z.string().describe("Package ID"),
 			id: z.string().describe("ID/Name of the Message Mapping"),
@@ -203,7 +204,7 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 		"create-mapping-testiflow",
 		`Creates an iflow called if_echo_mapping
 This iflow can be used to test mappings, it returns the content after mapping.
-You might want to check if the iflow already exists before creating it.
+Allways run this tool before using the test iflow because it resets old content of the iflow.
 To test a mapping use the usual update procedure but replace the current mapping and datatypes with yours
 The endpoint can also be found using the regular endpoint finding procedure`,
 		{

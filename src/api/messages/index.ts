@@ -193,7 +193,7 @@ export const getMessages = async (
 					message.messageAttachementFiles?.push({
 						description: attachement.name as string,
 						// TS ignore because SAP specification is not what they actually provide
-						
+
 						data: await getMessageMedia(
 							// @ts-ignore
 							attachement["Id"] as string
@@ -256,6 +256,13 @@ export const getMessageMedia = async (mediaId: string): Promise<string> => {
 };
 
 export const createMappingTestIflow = async (pkgId: string) => {
+	try {
+		await integrationDesigntimeArtifactsApi
+			.requestBuilder()
+			.delete("if_echo_mapping", "active")
+			.execute(await getCurrentDestionation());
+	} catch (error) {}
+
 	const iflowBuffer = await folderToZipBuffer(
 		path.resolve(projPath, "resources", "helpers", "if_echo_mapping")
 	);

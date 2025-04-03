@@ -21,7 +21,6 @@ const registerDefaultMiddleware = (server: McpServerWithMiddleware) => {
 
 export const registerAllHandlers = (server: McpServerWithMiddleware) => {
 	registerDefaultMiddleware(server);
-
 	registerPackageHandlers(server);
 	registerIflowHandlers(server);
 	registerPackageDiscoverHandler(server);

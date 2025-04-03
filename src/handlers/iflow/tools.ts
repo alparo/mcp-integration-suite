@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
 	createIflow,
+	deployIflow,
 	getEndpoints,
 	getIflowContentString,
 	getIflowFolder,
@@ -10,7 +11,11 @@ import {
 import { logError, logInfo } from "../..";
 import { getiFlowToImage } from "../../api/iflow/diagram";
 import { McpServerWithMiddleware } from "../../utils/middleware";
-import { deployArtifact, waitAndGetDeployStatus } from "../../api/deployment";
+import {
+	getDeploymentErrorReason,
+	waitAndGetDeployStatus,
+} from "../../api/deployment";
+import { text } from "node:stream/consumers";
 
 export const updateFiles = z.array(
 	z.object({
@@ -127,7 +132,7 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 				if (autoDeploy) {
 					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
-					const taskId = await deployArtifact(id);
+					const taskId = await deployIflow(id);
 					const deployStatus = await waitAndGetDeployStatus(taskId);
 					result["deployStatus"] = deployStatus;
 				}
@@ -201,6 +206,65 @@ Get endpoint(s) of iflow and its URLs and Protocols
 					},
 				],
 			};
+		}
+	);
+
+	server.registerTool(
+		"get-deploy-error",
+		`
+If you tried to deploy an Artifact like Iflow or mapping and got an error use this too to get the error message and context
+`,
+		{
+			id: z
+				.string()
+				.describe(
+					"Artifact ID, can be iflow name or message mapping name etc."
+				),
+		},
+		async ({ id }) => {
+			const error = await getDeploymentErrorReason(id);
+			return {
+				content: [
+					{
+						type: "text",
+						text: JSON.stringify(error),
+					},
+				],
+			};
+		}
+	);
+
+	server.registerTool(
+		"deploy-iflow",
+		`
+deploy a iflow
+If the deployment status is unsuccessful try getting information from get-deploy-error
+		`,
+		{ iflowId: z.string().describe("ID/Name of iflow") },
+
+		async ({ iflowId }) => {
+			try {
+				const taskId = await deployIflow(iflowId);
+				const deployStatus = await waitAndGetDeployStatus(taskId);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({ deployStatus }),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({ error }),
+						},
+					],
+					isError: true,
+				};
+			}
 		}
 	);
 };

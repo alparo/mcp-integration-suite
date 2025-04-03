@@ -119,9 +119,20 @@ export const saveAsNewVersion = async (id: string) => {
 	}).execute(await getCurrentDestionation());
 };
 
-export const deployMapping = async (id: string): Promise<void> => {
-	await deployMessageMappingDesigntimeArtifact({
+/**
+ * Deploy Mapping
+ * @param Mapping ID
+ * @returns Deployment Task ID
+ */
+export const deployMapping = async (id: string): Promise<string> => {
+	const deployRes = await deployMessageMappingDesigntimeArtifact({
 		id,
 		version: "active",
-	}).execute(await getCurrentDestionation());
+	}).executeRaw(await getCurrentDestionation());
+
+	if (deployRes.status !== 202) {
+		throw new Error("Error starting deployment of " + id);
+	}
+
+	return deployRes.data;
 };

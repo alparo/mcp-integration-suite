@@ -3,6 +3,7 @@ import { deployMapping, getMessageMappingContentString, saveAsNewVersion, update
 import { McpServerWithMiddleware } from "../../utils/middleware";
 import { z } from "zod";
 import { updateFiles } from "../iflow/tools";
+import { waitAndGetDeployStatus } from "../../api/deployment";
 
 export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 	server.registerTool(
@@ -102,4 +103,38 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
                 }
             }
         );
+
+            server.registerTool(
+                "deploy-message-mapping",
+                `
+        deploy a message-mapping
+        If the deployment status is unsuccessful try getting information from get-deploy-error
+                `,
+                { mappingId: z.string().describe("ID/Name of message-mapping") },
+        
+                async ({ mappingId }) => {
+                    try {
+                        const taskId = await deployMapping(mappingId);
+                        const deployStatus = await waitAndGetDeployStatus(taskId);
+                        return {
+                            content: [
+                                {
+                                    type: "text",
+                                    text: JSON.stringify({ deployStatus }),
+                                },
+                            ],
+                        };
+                    } catch (error) {
+                        return {
+                            content: [
+                                {
+                                    type: "text",
+                                    text: JSON.stringify({ error }),
+                                },
+                            ],
+                            isError: true,
+                        };
+                    }
+                }
+            );
 };

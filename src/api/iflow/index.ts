@@ -1,5 +1,5 @@
 import { integrationContent } from "../../generated/IntegrationContent/service";
-import { extractToFolder, folderToZipBuffer, patchFile } from "../../utils/zip";
+import { extractToFolder, folderToZipBuffer } from "../../utils/zip";
 import { getCurrentDestionation, getOAuthToken } from "../api_destination";
 import { updateFiles } from "../../handlers/iflow/tools";
 
@@ -11,7 +11,7 @@ import {
 	ServiceEndpoints,
 } from "../../generated/IntegrationContent";
 import { logInfo } from "../..";
-import { parseFolder } from "../../utils/fileBasedUtils";
+import { parseFolder, patchFile } from "../../utils/fileBasedUtils";
 import { getEndpointUrl } from "../../utils/getEndpointUrl";
 const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
 	integrationContent();
@@ -192,4 +192,23 @@ export const getEndpoints = async (id?: string) => {
 	});
 
 	return endpoints;
+};
+
+/**
+ * Deploy Iflow
+ * Only works for iflow deployment altough API is called deployArtifact
+ * @param id Iflow ID
+ * @returns Deployment Task ID
+ */
+export const deployIflow = async (id: string): Promise<string> => {
+	const deployRes = await deployIntegrationDesigntimeArtifact({
+		id,
+		version: "active",
+	}).executeRaw(await getCurrentDestionation());
+
+	if (deployRes.status !== 202) {
+		throw new Error("Error starting deployment of " + id);
+	}
+
+	return deployRes.data;
 };

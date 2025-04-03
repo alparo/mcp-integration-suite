@@ -74,7 +74,7 @@ export const updateIflow = async (
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
-		await patchFile(iflowPath, file.filepath, file.content);
+		await patchFile(iflowPath, file.filepath, file.content, file.appendMode);
 	}
 
 	const iflowBuffer = await folderToZipBuffer(iflowPath);

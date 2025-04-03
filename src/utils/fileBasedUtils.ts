@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import { glob } from "glob";
 import path from "path";
 import { logInfo } from "..";
-import { mkdir, writeFile } from "fs/promises";
+import { appendFile, mkdir, writeFile } from "fs/promises";
 
 /**
  * Get all files of a folder as one concatinated string for AI readability
@@ -37,9 +37,15 @@ export const parseFolder = async (folderPath: string): Promise<string> => {
 export const patchFile = async (
 	basePath: string,
 	relativePath: string,
-	content: string
+	content: string,
+	append: boolean
 ): Promise<void> => {
 	const filePath = path.join(basePath, relativePath);
+
+	if (append) {
+		await appendFile(filePath, content);
+	}
+
 	await mkdir(path.dirname(filePath), { recursive: true });
 	await writeFile(filePath, content);
 	return;

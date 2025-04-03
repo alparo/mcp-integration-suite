@@ -26,6 +26,7 @@ export const updateFiles = z.array(
 				'filepath within project. E.g. "resources/scenarioflows/integrationflow/myiflow.iflw    Does not have to be an existing file'
 			),
 		content: z.string().describe(`File content.`),
+		appendMode: z.boolean().default(false).describe("This can be useful to split requests with large texts into smaller pieces.\n False: file will be replaced by given content True: existing file will be appended with content")
 	})
 );
 

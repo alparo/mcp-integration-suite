@@ -83,6 +83,8 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
 					await deployMapping(id);
+					const deployStatus = await waitAndGetDeployStatus(taskId);
+					result["deployStatus"] = deployStatus;
 				}
 
 				return {

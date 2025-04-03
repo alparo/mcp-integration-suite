@@ -36,7 +36,10 @@ export const getMessageMappingFolder = async (id: string): Promise<string> => {
 export const updateMessageMapping = async (
 	id: string,
 	messagemappingFiles: z.infer<typeof updateFiles>
-) => {
+): Promise<{
+	messageMappingUpdate: { status: number; text: string };
+	deployStatus?: string;
+}> => {
 	const messagemappingPath = await getMessageMappingFolder(id);
 
 	for (const file of messagemappingFiles) {

@@ -46,7 +46,7 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 	);
 
         server.registerTool(
-            "update-message mapping",
+            "update-message-mapping",
             `Update or create files/content of an message mapping
     You only have to provide files that need to be updated but allways send the full file
     Make sure you ONLY change the things the user instructs you to and keep all other things

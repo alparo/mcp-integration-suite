@@ -6,6 +6,7 @@ import { updateFiles } from "../../handlers/iflow/tools";
 import { z } from "zod";
 import semver from "semver";
 import {
+	Configurations,
 	deployIntegrationDesigntimeArtifact,
 	integrationDesigntimeArtifactSaveAsVersion,
 	ServiceEndpoints,
@@ -13,8 +14,11 @@ import {
 import { logInfo } from "../..";
 import { parseFolder, patchFile } from "../../utils/fileBasedUtils";
 import { getEndpointUrl } from "../../utils/getEndpointUrl";
-const { integrationDesigntimeArtifactsApi, serviceEndpointsApi } =
-	integrationContent();
+const {
+	integrationDesigntimeArtifactsApi,
+	serviceEndpointsApi,
+	configurationsApi,
+} = integrationContent();
 
 /**
  * Download IFlow unzipp it and get the folderpath
@@ -74,16 +78,23 @@ export const updateIflow = async (
 	const iflowPath = await getIflowFolder(id);
 
 	for (const file of iflowFiles) {
-		await patchFile(iflowPath, file.filepath, file.content, file.appendMode);
+		await patchFile(
+			iflowPath,
+			file.filepath,
+			file.content,
+			file.appendMode
+		);
 	}
 
 	const iflowBuffer = await folderToZipBuffer(iflowPath);
 
-	const newIflowEntity = integrationDesigntimeArtifactsApi.entityBuilder().fromJson({
-		version: 'active',
-		id,
-		artifactContent: iflowBuffer.toString("base64")
-	});
+	const newIflowEntity = integrationDesigntimeArtifactsApi
+		.entityBuilder()
+		.fromJson({
+			version: "active",
+			id,
+			artifactContent: iflowBuffer.toString("base64"),
+		});
 
 	await integrationDesigntimeArtifactsApi
 		.requestBuilder()
@@ -181,4 +192,22 @@ export const deployIflow = async (id: string): Promise<string> => {
 	}
 
 	return deployRes.data;
+};
+
+export const getIflowConfiguration = async (
+	iflowId: string
+): Promise<
+	{ ParameterKey: string; ParameterValue?: string; DataType?: string }[]
+> => {
+	const configurationRes = await integrationDesigntimeArtifactsApi
+		.requestBuilder()
+		.getByKey(iflowId, "active")
+		.appendPath("/Configurations")
+		.executeRaw(await getCurrentDestionation());
+
+	if (configurationRes.status !== 200 || !configurationRes.data.d.results) {
+		throw new Error(`Error getting configuration of ${iflowId} status: ${configurationRes.status}, response: ${configurationRes.data}`)
+	}
+
+	return configurationRes.data.d.results;
 };

@@ -3,6 +3,7 @@ import {
 	createIflow,
 	deployIflow,
 	getEndpoints,
+	getIflowConfiguration,
 	getIflowContentString,
 	getIflowFolder,
 	saveAsNewVersion,
@@ -26,7 +27,12 @@ export const updateFiles = z.array(
 				'filepath within project. E.g. "resources/scenarioflows/integrationflow/myiflow.iflw    Does not have to be an existing file'
 			),
 		content: z.string().describe(`File content.`),
-		appendMode: z.boolean().default(false).describe("This can be useful to split requests with large texts into smaller pieces.\n False: file will be replaced by given content True: existing file will be appended with content")
+		appendMode: z
+			.boolean()
+			.default(false)
+			.describe(
+				"This can be useful to split requests with large texts into smaller pieces.\n False: file will be replaced by given content True: existing file will be appended with content"
+			),
 	})
 );
 
@@ -266,5 +272,37 @@ If the deployment status is unsuccessful try getting information from get-deploy
 		}
 	);
 
+	server.registerTool(
+		"get-iflow-configurations",
+		`Get all configurations of an IFlow
+Configuration is used to dynamically set values within an iflow. For example a username could be stored in a configuration instead of the iflow directly
+Not every iflow is using configurations tho. most of the time configuration is made in iflow directly
+`,
+		{
+			iflowId: z.string().describe("Id or name of the iflow"),
+		},
+		async ({ iflowId }) => {
+			try {
+				const configurations = await getIflowConfiguration(iflowId);
+				
+
+				return {
+					content: [
+						{
+							text: JSON.stringify({
+								iflowConfiguration: configurations,
+							}),
+							type: "text",
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
+		}
+	);
 
 };

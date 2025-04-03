@@ -8,6 +8,7 @@ import semver from "semver";
 import {
 	Configurations,
 	deployIntegrationDesigntimeArtifact,
+	IntegrationDesigntimeArtifacts,
 	integrationDesigntimeArtifactSaveAsVersion,
 	ServiceEndpoints,
 } from "../../generated/IntegrationContent";
@@ -18,6 +19,7 @@ const {
 	integrationDesigntimeArtifactsApi,
 	serviceEndpointsApi,
 	configurationsApi,
+	integrationPackagesApi,
 } = integrationContent();
 
 /**
@@ -206,8 +208,34 @@ export const getIflowConfiguration = async (
 		.executeRaw(await getCurrentDestionation());
 
 	if (configurationRes.status !== 200 || !configurationRes.data.d.results) {
-		throw new Error(`Error getting configuration of ${iflowId} status: ${configurationRes.status}, response: ${configurationRes.data}`)
+		throw new Error(
+			`Error getting configuration of ${iflowId} status: ${configurationRes.status}, response: ${configurationRes.data}`
+		);
 	}
 
 	return configurationRes.data.d.results;
+};
+
+export const getAllIflowsByPackage = async (
+	pkgId: string
+): Promise<
+	{
+		[k in keyof typeof integrationDesigntimeArtifactsApi.schema]:
+			| string
+			| undefined;
+	}[]
+> => {
+	const allIflowsRes = await integrationPackagesApi
+		.requestBuilder()
+		.getByKey(pkgId)
+		.appendPath("/IntegrationDesigntimeArtifacts")
+		.executeRaw(await getCurrentDestionation());
+	integrationDesigntimeArtifactsApi.schema;
+	if (allIflowsRes.status !== 200 || !allIflowsRes?.data?.d?.results) {
+		throw new Error(
+			`Error getting iflows of ${pkgId} status: ${allIflowsRes.status}, response: ${allIflowsRes.data}`
+		);
+	}
+
+	return allIflowsRes.data.d.results;
 };

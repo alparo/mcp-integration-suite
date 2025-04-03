@@ -2,6 +2,7 @@ import { logError, logInfo } from "../..";
 import {
 	createMessageMapping,
 	deployMapping,
+	getAllMessageMappings,
 	getMessageMappingContentString,
 	saveAsNewVersion,
 	updateMessageMapping,
@@ -87,12 +88,13 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 					await saveAsNewVersion(id);
 					try {
 						const taskId = await deployMapping(id);
-						const deployStatus = await waitAndGetDeployStatus(taskId);
+						const deployStatus =
+							await waitAndGetDeployStatus(taskId);
 						result["deployStatus"] = deployStatus;
 					} catch (error) {
-						result["deployStatus"] = 'Unable to check deployment status for message mapping';
+						result["deployStatus"] =
+							"Unable to check deployment status for message mapping";
 					}
-
 				}
 
 				return {
@@ -159,6 +161,31 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 						{
 							type: "text",
 							text: "Message Mapping successfully created. You can now use get-messagemapping and then edit it and upload with update-message-mapping",
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
+		}
+	);
+
+	server.registerTool(
+		"get-all-messagemappings",
+		"Get all available message mappings",
+		{},
+		async () => {
+			try {
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({
+								messageMappings: await getAllMessageMappings(),
+							}),
 						},
 					],
 				};

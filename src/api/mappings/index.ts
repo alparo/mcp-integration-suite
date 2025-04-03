@@ -53,33 +53,17 @@ export const updateMessageMapping = async (
 
 	const messagemappingBuffer = await folderToZipBuffer(messagemappingPath);
 
-	const requestUrl = await messageMappingDesigntimeArtifactsApi
+	const newMapping = messageMappingDesigntimeArtifactsApi.entityBuilder().fromJson({
+		id,
+		version: 'active',
+		artifactContent: messagemappingBuffer.toString("base64")
+	})
+
+	await messageMappingDesigntimeArtifactsApi
 		.requestBuilder()
-		.getByKey(id, "active")
-		.url(await getCurrentDestionation());
-
-	const authHeader = (await getOAuthToken()).http_header;
-
-	// Use fetch because SAP API is not compatible with SAP SDK (yep...)
-	const mmUpdateResponse = await fetch(requestUrl, {
-		headers: {
-			[authHeader.key]: authHeader.value,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			Name: id,
-			ArtifactContent: messagemappingBuffer.toString("base64"),
-		}),
-		method: "PUT",
-	});
-
-	if (mmUpdateResponse.status !== 200) {
-		throw new Error(
-			"Error while updating mapping ZIP" +
-				mmUpdateResponse.status +
-				(await mmUpdateResponse.text())
-		);
-	}
+		.update(newMapping)
+		.replaceWholeEntityWithPut()
+		.execute(await getCurrentDestionation());
 
 	return {
 		messageMappingUpdate: {

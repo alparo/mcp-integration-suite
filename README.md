@@ -33,3 +33,4 @@ For Claude Desktop: `~/Library/Application\ Support/Claude/claude_desktop_config
 - CSRF implementation
 - Iflow configuration
 - more auth methods
+- list artifacts

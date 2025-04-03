@@ -15,7 +15,7 @@ import {
 	getDeploymentErrorReason,
 	waitAndGetDeployStatus,
 } from "../../api/deployment";
-import { text } from "node:stream/consumers";
+import { formatError } from "../../utils/customErrHandler";
 
 export const updateFiles = z.array(
 	z.object({
@@ -57,13 +57,8 @@ Some ressources might relay on other package artefacts which are not included bu
 			} catch (error) {
 				logError(error);
 				return {
-					content: [
-						{
-							type: "text",
-							text: JSON.stringify({ type: "error", error }),
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -88,15 +83,9 @@ Some ressources might relay on other package artefacts which are not included bu
 					],
 				};
 			} catch (error) {
-				logError(error);
 				return {
-					content: [
-						{
-							type: "text",
-							text: JSON.stringify({ type: "error", error }),
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -149,15 +138,9 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 					],
 				};
 			} catch (error) {
-				logError(error);
 				return {
-					content: [
-						{
-							type: "text",
-							text: `Error: Could not update`,
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}
@@ -175,15 +158,25 @@ Get endpoint(s) of iflow and its URLs and Protocols
 				.describe("Iflow ID. By default it will get all endpoints"),
 		},
 		async ({ iflowId }) => {
-			const endpoints = await getEndpoints(iflowId);
-			return {
-				content: [
-					{
-						type: "text",
-						text: JSON.stringify({ type: "success", endpoints }),
-					},
-				],
-			};
+			try {
+				const endpoints = await getEndpoints(iflowId);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify({
+								type: "success",
+								endpoints,
+							}),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 
@@ -223,15 +216,22 @@ If the response is empty it means there is no deployment error and it was succes
 				),
 		},
 		async ({ id }) => {
-			const error = await getDeploymentErrorReason(id);
-			return {
-				content: [
-					{
-						type: "text",
-						text: JSON.stringify(error),
-					},
-				],
-			};
+			try {
+				const errorReason = await getDeploymentErrorReason(id);
+				return {
+					content: [
+						{
+							type: "text",
+							text: JSON.stringify(errorReason),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 
@@ -257,13 +257,8 @@ If the deployment status is unsuccessful try getting information from get-deploy
 				};
 			} catch (error) {
 				return {
-					content: [
-						{
-							type: "text",
-							text: JSON.stringify({ error }),
-						},
-					],
 					isError: true,
+					content: [formatError(error)],
 				};
 			}
 		}

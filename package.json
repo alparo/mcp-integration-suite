@@ -30,6 +30,7 @@
         "@sap-cloud-sdk/temporal-de-serializers": "^3.26.4",
         "@sap-cloud-sdk/test-util": "^3.26.4",
         "adm-zip": "^0.5.16",
+        "axios": "^1.8.4",
         "dotenv": "^16.4.7",
         "glob": "^11.0.1",
         "mcps-logger": "^1.0.0-rc.4",

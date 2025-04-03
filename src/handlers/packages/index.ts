@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createPackage, getPackage, getPackages } from "../../api/packages";
 import { McpServerWithMiddleware } from "../../utils/middleware";
+import { formatError } from "../../utils/customErrHandler";
 
 export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 	server.registerTool(
@@ -9,10 +10,19 @@ export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 		"Get all integration packages",
 		{},
 		async () => {
-			const allPackages = await getPackages();
-			return {
-				content: [{ type: "text", text: JSON.stringify(allPackages) }],
-			};
+			try {
+				const allPackages = await getPackages();
+				return {
+					content: [
+						{ type: "text", text: JSON.stringify(allPackages) },
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 
@@ -23,12 +33,19 @@ export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 			name: z.string().describe("Name/ID of the package"),
 		},
 		async ({ name }) => {
-			const packageContent = await getPackage(name);
-			return {
-				content: [
-					{ type: "text", text: JSON.stringify(packageContent) },
-				],
-			};
+			try {
+				const packageContent = await getPackage(name);
+				return {
+					content: [
+						{ type: "text", text: JSON.stringify(packageContent) },
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 
@@ -47,12 +64,19 @@ export const registerPackageHandlers = (server: McpServerWithMiddleware) => {
 				.describe("Short text of the package"),
 		},
 		async ({ id, name, shortText }) => {
-			const packageContent = await createPackage(id, name, shortText);
-			return {
-				content: [
-					{ type: "text", text: JSON.stringify(packageContent) },
-				],
-			};
+			try {
+				const packageContent = await createPackage(id, name, shortText);
+				return {
+					content: [
+						{ type: "text", text: JSON.stringify(packageContent) },
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
 		}
 	);
 };

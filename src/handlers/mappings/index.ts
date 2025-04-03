@@ -57,6 +57,9 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 		`Update or create files/content of an message mapping
     You only have to provide files that need to be updated but allways send the full file
     Make sure you ONLY change the things the user instructs you to and keep all other things
+
+	
+
     Folder structure is like this:
     src/main/resources/ is the root
     src/main/resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
@@ -82,9 +85,14 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 				if (autoDeploy) {
 					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
-					await deployMapping(id);
-					const deployStatus = await waitAndGetDeployStatus(taskId);
-					result["deployStatus"] = deployStatus;
+					try {
+						const taskId = await deployMapping(id);
+						const deployStatus = await waitAndGetDeployStatus(taskId);
+						result["deployStatus"] = deployStatus;
+					} catch (error) {
+						result["deployStatus"] = 'Unable to check deployment status for message mapping';
+					}
+
 				}
 
 				return {

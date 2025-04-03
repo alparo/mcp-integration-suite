@@ -16,6 +16,7 @@ import {
 	waitAndGetDeployStatus,
 } from "../../api/deployment";
 import { formatError } from "../../utils/customErrHandler";
+import { createMessageMapping } from "../../api/mappings";
 
 export const updateFiles = z.array(
 	z.object({
@@ -252,6 +253,33 @@ If the deployment status is unsuccessful try getting information from get-deploy
 						{
 							type: "text",
 							text: JSON.stringify({ deployStatus }),
+						},
+					],
+				};
+			} catch (error) {
+				return {
+					isError: true,
+					content: [formatError(error)],
+				};
+			}
+		}
+	);
+
+	server.registerTool(
+		"create-empty-mapping",
+		`Create an empty message mapping without functionality. You probably want to add content to it afterwards with tool get-mapping and then update-mapping`,
+		{
+			packageId: z.string().describe("Package ID"),
+			id: z.string().describe("ID/Name of the Message Mapping"),
+		},
+		async ({ packageId, id }) => {
+			try {
+				await createMessageMapping(packageId, id);
+				return {
+					content: [
+						{
+							type: "text",
+							text: "Message Mapping successfully created. You can now use get-mapping and then edit it and upload with update-mapping",
 						},
 					],
 				};

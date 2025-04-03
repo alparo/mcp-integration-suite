@@ -4,6 +4,7 @@ import { logError } from "..";
 
 export const formatError = (error: any): contentReturnElement => {
 	logError(Object.keys(error));
+	logError(error);
 	if (error === null) {
 		return {
 			type: "text",

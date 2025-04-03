@@ -10,6 +10,7 @@ import { extractToFolder, folderToZipBuffer } from "../../utils/zip";
 import { getCurrentDestionation, getOAuthToken } from "../api_destination";
 import { z } from "zod";
 import semver from "semver";
+import { executeHttpRequest } from "@sap-cloud-sdk/http-client";
 
 const { messageMappingDesigntimeArtifactsApi } = integrationContent();
 
@@ -44,16 +45,33 @@ export const updateMessageMapping = async (
 
 	const messagemappingBuffer = await folderToZipBuffer(messagemappingPath);
 
-	const newIflowEntity = messageMappingDesigntimeArtifactsApi.entityBuilder().fromJson({
-		version: 'active',
-		id,
-		artifactContent: messagemappingBuffer.toString("base64")
-	});
-	await messageMappingDesigntimeArtifactsApi
+	const requestUrl = await messageMappingDesigntimeArtifactsApi
 		.requestBuilder()
-		.update(newIflowEntity)
-		.replaceWholeEntityWithPut()
-		.executeRaw(await getCurrentDestionation());
+		.getByKey(id, "active")
+		.url(await getCurrentDestionation());
+
+	const authHeader = (await getOAuthToken()).http_header;
+
+	// Use fetch because SAP API is not compatible with SAP SDK (yep...)
+	const mmUpdateResponse = await fetch(requestUrl, {
+		headers: {
+			[authHeader.key]: authHeader.value,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			Name: id,
+			ArtifactContent: messagemappingBuffer.toString("base64"),
+		}),
+		method: "PUT",
+	});
+
+	if (mmUpdateResponse.status !== 200) {
+		throw new Error(
+			"Error while updating mapping ZIP" +
+				mmUpdateResponse.status +
+				(await mmUpdateResponse.text())
+		);
+	}
 
 	return {
 		messageMappingUpdate: {

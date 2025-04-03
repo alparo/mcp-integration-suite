@@ -84,11 +84,16 @@ export const updateIflow = async (
 		.getByKey(id, "active")
 		.execute(await getCurrentDestionation());
 
-	currentIflow.artifactContent = iflowBuffer.toString("base64");
+
+	const newIflowEntity = integrationDesigntimeArtifactsApi.entityBuilder().fromJson({
+		version: 'active',
+		id,
+		artifactContent: iflowBuffer.toString("base64")
+	});
 
 	await integrationDesigntimeArtifactsApi
 		.requestBuilder()
-		.update(currentIflow)
+		.update(newIflowEntity)
 		.replaceWholeEntityWithPut()
 		.execute(await getCurrentDestionation());
 

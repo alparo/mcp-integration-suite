@@ -213,6 +213,7 @@ Get endpoint(s) of iflow and its URLs and Protocols
 		"get-deploy-error",
 		`
 If you tried to deploy an Artifact like Iflow or mapping and got an error use this too to get the error message and context
+If the response is empty it means there is no deployment error and it was successful
 `,
 		{
 			id: z

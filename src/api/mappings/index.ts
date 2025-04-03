@@ -134,5 +134,11 @@ export const deployMapping = async (id: string): Promise<string> => {
 		throw new Error("Error starting deployment of " + id);
 	}
 
+	// Actually SAP API is broken, it returns an empty body instead of the taskId, so waiting for deployment isn't possible
+	if (deployRes.data) {
+		throw new Error(`The deployment was triggered successfully altough didn't return a token to wait for the deployment to finish
+		But you can still use get-deploy-error to check the status`);
+	}
+	logInfo(`got TaskId ${deployRes.data} for deployment of ${id}`);
 	return deployRes.data;
 };

@@ -17,7 +17,7 @@
         "build": "npm run build:generateclient && npm run build:tsc",
         "start": "node dist/server.js",
         "dev": "npm run build:tsc && npm run dev:inspector",
-        "dev:inspector": "npx @modelcontextprotocol/inspector node",
+        "dev:inspector": "npx @modelcontextprotocol/inspector node ./dist/index.js",
         "test": "npm run build && node dist/test.js",
         "watch": "npm-watch dev",
         "watch:log": "tail -n 20 -F ~/Library/Logs/Claude/mcp-server-mcp-integration-suite.log"

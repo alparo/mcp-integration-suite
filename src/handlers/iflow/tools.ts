@@ -18,7 +18,6 @@ import {
 	waitAndGetDeployStatus,
 } from "../../api/deployment";
 import { formatError } from "../../utils/customErrHandler";
-import { createMessageMapping } from "../../api/mappings";
 
 export const updateFiles = z.array(
 	z.object({

@@ -53,22 +53,35 @@ export const updateMessageMapping = async (
 
 	const messagemappingBuffer = await folderToZipBuffer(messagemappingPath);
 
-	const newMapping = messageMappingDesigntimeArtifactsApi.entityBuilder().fromJson({
-		id,
-		version: 'active',
-		artifactContent: messagemappingBuffer.toString("base64")
-	})
+	const newMapping = messageMappingDesigntimeArtifactsApi
+		.entityBuilder()
+		.fromJson({
+			Name: id,
+			Version: "active",
+			ArtifactContent: messagemappingBuffer.toString("base64"),
+		});
 
-	await messageMappingDesigntimeArtifactsApi
+	const url = await messageMappingDesigntimeArtifactsApi
 		.requestBuilder()
-		.update(newMapping)
-		.replaceWholeEntityWithPut()
-		.execute(await getCurrentDestionation());
+		.getByKey(id, "active")
+		.url(await getCurrentDestionation());
+
+	const res = await executeHttpRequest(await getCurrentDestionation(), {
+		url,
+		method: 'PUT',
+		headers: {"Content-Type": "application/json"},
+		data: JSON.stringify(newMapping.toJSON())
+		
+	});
+
+	if (res.status !== 200) {
+		throw new Error("Error updating message mapping");
+	}
 
 	return {
 		messageMappingUpdate: {
-			status: 200,
-			text: "successfully updated",
+			status: res.status,
+			text: "Succesfully updated mapping",
 		},
 	};
 };

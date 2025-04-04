@@ -138,8 +138,13 @@ src/main/resources/scenarioflows/integrationflow/<iflow id>.iflw contains the if
 					logInfo("auto deploy is activated");
 					await saveAsNewVersion(id);
 					const taskId = await deployIflow(id);
-					const deployStatus = await waitAndGetDeployStatus(taskId);
-					result["deployStatus"] = deployStatus;
+					if(taskId) {
+						const deployStatus = await waitAndGetDeployStatus(taskId);
+						result["deployStatus"] = deployStatus;
+					} else {
+						result["deployStatus"] = "unknown, please check manually. Deployment was scheduled"
+					}
+					
 				}
 
 				return {

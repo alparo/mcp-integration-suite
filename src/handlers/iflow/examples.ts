@@ -9,35 +9,40 @@ import { McpServerWithMiddleware } from "../../utils/middleware";
 export const registerIflowExampleHandler = (server: McpServerWithMiddleware) => {
 	server.registerTool(
 		"list-iflow-examples",
-		`
+		{
+			description: `
 Get a list of available iflow examples.
 You can use these examples to query get-iflow-example
         `,
-		{},
-		async() => {
-			return {
-				content: [
-					{
-						type: "text",
-						text: JSON.stringify(availableExamples),
-					},
-				],
-			};
-		}
+			inputSchema: {},
+		},
+		async (args: { [x: string]: any }) => {
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(availableExamples),
+        },
+      ],
+    };
+  }
 	);
 
 	server.registerTool(
 		"get-iflow-example",
-		`
+		{
+			description: `
 Get an existing iflow as an example to use to create or update other iflows
 Call list-iflow-examples to show available examples
         `,
-		{
-			name: z
-				.enum(Object.keys(availableExamples) as [string, ...string[]])
-				.describe("Example name from list-iflow-examples"),
+			inputSchema: {
+				name: z
+					.enum(Object.keys(availableExamples) as [string, ...string[]])
+					.describe("Example name from list-iflow-examples"),
+			},
 		},
-		async ({ name }) => {
+		async (args: { [x: string]: any }) => {
+    const { name } = args as { name: string };
 			const exampleObj = availableExamples[name];
 
 			if (!exampleObj) {

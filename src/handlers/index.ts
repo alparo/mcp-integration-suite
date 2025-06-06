@@ -2,7 +2,7 @@
 import { registerPackageHandlers } from "./packages";
 import { registerIflowHandlers } from "./iflow/tools";
 import { registerPackageDiscoverHandler } from "./discover/packages";
-import { registerIflowExampleHandler } from "./iflow/exmaples";
+import { registerIflowExampleHandler } from "./iflow/examples";
 import { registerMessageHandlers } from "./messages";
 import { McpServerWithMiddleware } from "../utils/middleware";
 import { logError, logInfo } from "..";

@@ -4,7 +4,7 @@
     "description": "MCP Server für Integration Package Management",
     "main": "dist/index.js",
     "scripts": {
-        "build:generateclient": "node src/scripts/buildOdataClient.js",
+        "build:generateclient": "node src/scripts/buildOdataClient.mjs",
         "build:tsc": "tsc -p tsconfig.json",
         "build": "npm run build:generateclient && npm run build:tsc",
         "start": "node dist/index.js",

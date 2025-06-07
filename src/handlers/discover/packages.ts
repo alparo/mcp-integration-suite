@@ -2,14 +2,17 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { projPath } from "../..";
-import { McpServerWithMiddleware } from "../../utils/middleware";
+import { MiddlewareManager, registerToolWithMiddleware } from "../../utils/middleware";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 const resourceDiscoverPath = path.resolve(projPath, "./resources/Discover");
 
-export const registerPackageDiscoverHandler = (server: McpServerWithMiddleware) => {
-	server.registerTool(
-		"discover-packages",
-		"Get information about Packages from discover center",
+export const registerPackageDiscoverHandler = (server: McpServer, middleware: MiddlewareManager) => {
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "discover-packages",
+                "Get information about Packages from discover center",
         {},
 		async () => {
 			return {

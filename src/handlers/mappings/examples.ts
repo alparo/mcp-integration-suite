@@ -1,11 +1,14 @@
 import { availableExamples } from "../../api/mappings/examples";
 import { parseFolder } from "../../utils/fileBasedUtils";
-import { McpServerWithMiddleware } from "../../utils/middleware";
+import { MiddlewareManager, registerToolWithMiddleware } from "../../utils/middleware";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-export const registerMappingsExampleHandler = (server: McpServerWithMiddleware) => {
-	server.registerTool(
-		"list-mapping-examples",
+export const registerMappingsExampleHandler = (server: McpServer, middleware: MiddlewareManager) => {
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "list-mapping-examples",
 		`Get all available message mapping examples.
 This is useful to edit existing or develope new message mappings
 A message mapping is a folder with contains one .mmap file which is the actual mapping.
@@ -26,10 +29,12 @@ src/main/resources/scenarioflows/mapping/<mapping id>.mmap contains the mapping 
 				],
 			};
 		}
-	);
+        );
 
-	server.registerTool(
-		"get-mapping-example",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "get-mapping-example",
 		"Get an example provided by list-mapping-examples",
 		{
 			name: z

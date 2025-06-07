@@ -1,13 +1,17 @@
 import { messageFilterSchema, sendRequestSchema } from "./types";
 import { getMessages, getMessagesCount } from "../../api/messages/messageLogs";
-import { McpServerWithMiddleware } from "../../utils/middleware";
+import { MiddlewareManager, registerToolWithMiddleware } from "../../utils/middleware";
 import { formatError } from "../../utils/customErrHandler";
 import { sendRequestToCPI } from "../../api/messages/sendMessageToCPI";
 
-export const registerMessageHandlers = (server: McpServerWithMiddleware) => {
-	server.registerTool(
-		"send-http-message",
-		`
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export const registerMessageHandlers = (server: McpServer, middleware: MiddlewareManager) => {
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "send-http-message",
+                `
 send an HTTP request to integration suite.
 If you need to get HTTP Endpoints please use get-iflow-endpoints
 Please only provide HTTP Path without endpoint etc if the URL is https://abc123.itcpi01-rt-cfapps.aa11.hana.ondemand.com/http/myendpoint You should send /http/myendpoint
@@ -20,8 +24,8 @@ If not specified otherwise the user probably wants to see the text in response
 
 Currently only non CSRF-protected endpoints are supported for POST requests, which could be a reason for 403 or 401
         `,
-		sendRequestSchema,
-		async ({ path, method, contentType, body, headers }) => {
+                sendRequestSchema,
+                async ({ path, method, contentType, body, headers }) => {
 			try {
 				const requestResult = await sendRequestToCPI(
 					path,
@@ -29,7 +33,7 @@ Currently only non CSRF-protected endpoints are supported for POST requests, whi
 					contentType,
 					body,
 					headers
-				);
+        );
 
 				return {
 					content: [
@@ -48,8 +52,10 @@ Currently only non CSRF-protected endpoints are supported for POST requests, whi
 		}
 	);
 
-	server.registerTool(
-		"get-messages",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "get-messages",
 		`
 Get message from the message monitoring
 This will include information about errors, attachements etc.
@@ -77,10 +83,12 @@ For bigger querys which don't need content of the messages consider using count-
 				};
 			}
 		}
-	);
+        );
 
-	server.registerTool(
-		"count-messages",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "count-messages",
 		`Count messages from the message monitoring
 This function can be usefull for making evaluations by counting messages with specific filters`,
 		{
@@ -106,5 +114,5 @@ This function can be usefull for making evaluations by counting messages with sp
 				};
 			}
 		}
-	);
+        );
 };

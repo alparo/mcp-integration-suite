@@ -1,10 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
-type MiddlewareFunction = (
-	next: () => Promise<void>,
-	name: string,
-	params: z.ZodRawShape
+export type MiddlewareFunction = (
+        next: () => Promise<void>,
+        name: string,
+        params: z.ZodRawShape
 ) => Promise<void>;
 
 export type contentReturnElement =
@@ -59,46 +59,32 @@ export class MiddlewareManager {
 }
 
 /**
- * Custom Middleware Server which extends McpServer by a middleware functionality
- * This is useful for logging atm
+ * Registers a tool while executing all configured middleware functions.
+ * Useful for logging or other cross-cutting concerns.
  */
-export class McpServerWithMiddleware extends McpServer {
-	private middlewareManager: MiddlewareManager;
+export function registerToolWithMiddleware(
+        server: McpServer,
+        middleware: MiddlewareManager,
+        name: string,
+        description: string,
+        params: z.ZodRawShape,
+        handler: (
+                args: { [x: string]: any },
+                extra: { [x: string]: unknown }
+        ) => Promise<{
+                [x: string]: unknown;
+                content: Array<contentReturnElement>;
+                _meta?: { [x: string]: unknown };
+                isError?: boolean;
+        }>
+) {
+        const wrappedHandler = async (
+                args: { [x: string]: any },
+                extra: { [x: string]: unknown }
+        ) => {
+                await middleware.execute(name, params);
+                return handler(args, extra);
+        };
 
-	constructor(options: ConstructorParameters<typeof McpServer>[0]) {
-		super(options);
-		this.middlewareManager = new MiddlewareManager();
-	}
-
-	use(middleware: MiddlewareFunction) {
-		this.middlewareManager.use(middleware);
-	}
-
-	/**
-	 * wrapper function for server.tool() to have middleware functionalities
-	 */
-	registerTool(
-		name: string,
-		description: string,
-		params: z.ZodRawShape,
-		handler: (
-			args: { [x: string]: any },
-			extra: { [x: string]: unknown }
-		) => Promise<{
-			[x: string]: unknown;
-			content: Array<contentReturnElement>;
-			_meta?: { [x: string]: unknown };
-			isError?: boolean;
-		}>
-	) {
-		const wrappedHandler = async (
-			args: { [x: string]: any },
-			extra: { [x: string]: unknown }
-		) => {
-			await this.middlewareManager.execute(name, params);
-			return handler(args, extra);
-		};
-
-		return this.tool(name, description, params, wrappedHandler);
-	}
+        return server.tool(name, description, params, wrappedHandler);
 }

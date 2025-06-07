@@ -4,46 +4,42 @@ import { z } from "zod";
 import { parseFolder } from "../../utils/fileBasedUtils";
 import { projPath } from "../..";
 import { availableExamples } from "../../api/iflow/examples";
-import { McpServerWithMiddleware } from "../../utils/middleware";
+import { MiddlewareManager, registerToolWithMiddleware } from "../../utils/middleware";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-export const registerIflowExampleHandler = (server: McpServerWithMiddleware) => {
-	server.registerTool(
-		"list-iflow-examples",
-		{
-			description: `
-Get a list of available iflow examples.
-You can use these examples to query get-iflow-example
-        `,
-			inputSchema: {},
-		},
-		async (args: { [x: string]: any }) => {
-    return {
-      content: [
-        {
-          type: "text",
-          text: JSON.stringify(availableExamples),
-        },
-      ],
-    };
+export const registerIflowExampleHandler = (server: McpServer, middleware: MiddlewareManager) => {
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "list-iflow-examples",
+                `Get a list of available iflow examples.
+You can use these examples to query get-iflow-example`,
+                {},
+                async () => {
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(availableExamples),
+          },
+        ],
+      };
   }
-	);
+        );
 
-	server.registerTool(
-		"get-iflow-example",
-		{
-			description: `
-Get an existing iflow as an example to use to create or update other iflows
-Call list-iflow-examples to show available examples
-        `,
-			inputSchema: {
-				name: z
-					.enum(Object.keys(availableExamples) as [string, ...string[]])
-					.describe("Example name from list-iflow-examples"),
-			},
-		},
-		async (args: { [x: string]: any }) => {
-    const { name } = args as { name: string };
-			const exampleObj = availableExamples[name];
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "get-iflow-example",
+                `Get an existing iflow as an example to use to create or update other iflows
+Call list-iflow-examples to show available examples`,
+                {
+                        name: z
+                                .enum(Object.keys(availableExamples) as [string, ...string[]])
+                                .describe("Example name from list-iflow-examples"),
+                },
+                async ({ name }) => {
+                        const exampleObj = availableExamples[name];
 
 			if (!exampleObj) {
 				return {

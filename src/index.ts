@@ -9,7 +9,8 @@ import { config } from "dotenv";
 import { exit } from "process";
 import "./utils/logging"; // Removed .js again
 import { writeToErrLog, writeToLog } from "./utils/logging"; // Removed .js again
-import { McpServerWithMiddleware } from "./utils/middleware";
+import { MiddlewareManager } from "./utils/middleware";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import './utils/exitHandler';
 import { registerDeleteTempOnExit } from "./utils/exitHandler";
 
@@ -20,16 +21,18 @@ process.on("uncaughtException", (err) => {
 
 config({ path: path.join(projPath, ".env") });
 
-const server = new McpServerWithMiddleware({
-	name: "integration-suite",
-	version: "1.0.0",
-	capabilities: {
-		resources: {},
-		tools: {},
-	},
+const server = new McpServer({
+        name: "integration-suite",
+        version: "1.0.0",
+        capabilities: {
+                resources: {},
+                tools: {},
+        },
 });
 
-registerAllHandlers(server);
+const middlewareManager = new MiddlewareManager();
+
+registerAllHandlers(server, middlewareManager);
 
 async function main() {
 	registerDeleteTempOnExit();

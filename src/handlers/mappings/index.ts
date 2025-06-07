@@ -7,16 +7,20 @@ import {
 	saveAsNewVersion,
 	updateMessageMapping,
 } from "../../api/mappings";
-import { McpServerWithMiddleware } from "../../utils/middleware";
+import { MiddlewareManager, registerToolWithMiddleware } from "../../utils/middleware";
 import { z } from "zod";
 import { updateFiles } from "../iflow/tools";
 import { waitAndGetDeployStatus } from "../../api/deployment";
 import { formatError } from "../../utils/customErrHandler";
 import { createMappingTestIflow } from "../../api/messages/messageLogs";
 
-export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
-	server.registerTool(
-		"get-messagemapping",
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+export const registerMappingsHandler = (server: McpServer, middleware: MiddlewareManager) => {
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "get-messagemapping",
 		`Get the data of an Message Mapping and the contained ressources. 
     Some ressources might relay on other package artefacts which are not included but reffrenced
     `,
@@ -52,10 +56,12 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 				};
 			}
 		}
-	);
+        );
 
-	server.registerTool(
-		"update-message-mapping",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "update-message-mapping",
 		`Update or create files/content of an message mapping
     You only have to provide files that need to be updated but allways send the full file
     Make sure you ONLY change the things the user instructs you to and keep all other things
@@ -116,10 +122,12 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 				};
 			}
 		}
-	);
+        );
 
-	server.registerTool(
-		"deploy-message-mapping",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "deploy-message-mapping",
 		`
         deploy a message-mapping
         If the deployment status is unsuccessful try getting information from get-deploy-error
@@ -145,10 +153,12 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 				};
 			}
 		}
-	);
+        );
 
-	server.registerTool(
-		"create-empty-mapping",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "create-empty-mapping",
 		`Create an empty message mapping without functionality. You probably want to add content to it afterwards with tool get-mapping and then update-mapping
 		Be aware that most of the time you don't need to create an extra mapping. Most scenarios have a mapping within the iflow. Consider looking at iflow examples`,
 		{
@@ -173,10 +183,12 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 				};
 			}
 		}
-	);
+        );
 
-	server.registerTool(
-		"get-all-messagemappings",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "get-all-messagemappings",
 		"Get all available message mappings",
 		{},
 		async () => {
@@ -198,10 +210,12 @@ export const registerMappingsHandler = (server: McpServerWithMiddleware) => {
 				};
 			}
 		}
-	);
+        );
 
-	server.registerTool(
-		"create-mapping-testiflow",
+        registerToolWithMiddleware(
+                server,
+                middleware,
+                "create-mapping-testiflow",
 		`Creates an iflow called if_echo_mapping
 This iflow can be used to test mappings, it returns the content after mapping.
 Allways run this tool before using the test iflow because it resets old content of the iflow.
@@ -236,5 +250,5 @@ The endpoint can also be found using the regular endpoint finding procedure`,
 				};
 			}
 		}
-	);
+        );
 };

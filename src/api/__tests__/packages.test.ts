@@ -9,7 +9,10 @@ import { deletePackage } from "./helpers";
 // Load environment variables from .env file
 dotenv.config();
 
-describe("Package Management API", () => {
+const hasApiConfig = process.env.API_BASE_URL && (process.env.API_USER || process.env.API_OAUTH_CLIENT_ID);
+const describeIf = hasApiConfig ? describe : describe.skip;
+
+describeIf("Package Management API", () => {
     // Increase timeout for network requests
     jest.setTimeout(60000); // 60 seconds for potentially multiple API calls
 

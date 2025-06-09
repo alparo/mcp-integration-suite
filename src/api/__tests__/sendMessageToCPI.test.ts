@@ -5,7 +5,10 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
-describe("Send Message to CPI API", () => {
+const hasCpiConfig = process.env.CPI_BASE_URL && process.env.CPI_OAUTH_CLIENT_ID && process.env.CPI_OAUTH_CLIENT_SECRET && process.env.CPI_OAUTH_TOKEN_URL;
+const describeIf = hasCpiConfig ? describe : describe.skip;
+
+describeIf("Send Message to CPI API", () => {
     // Increase timeout for network requests
     jest.setTimeout(30000); // 30 seconds
 

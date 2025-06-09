@@ -74,16 +74,16 @@ describe('getEndpointUrl Utility Function', () => {
         expect(getEndpointUrl(mockEndpoint)).toEqual('');
     });
 
-     it('should return an empty string if CPI_BASE_URL is not set', () => {
+    it('should return an empty string if CPI_BASE_URL is not set', () => {
         const currentBaseUrl = process.env['CPI_BASE_URL'];
-        delete process.env['CPI_BASE_URL']; // Temporarily remove env var
+        delete process.env['CPI_BASE_URL'];
 
         const endpointId = 'myRestEndpoint';
         const mockEndpoint = createMockEndpoint(endpointId, 'REST');
-        // The function currently returns 'undefined/http/myRestEndpoint' if base URL is missing.
-        // Let's test for that specific behavior, although returning '' might be better.
-        expect(getEndpointUrl(mockEndpoint)).toEqual(`undefined/http/${endpointId}`);
 
-        process.env['CPI_BASE_URL'] = currentBaseUrl; // Restore env var
+        expect(getEndpointUrl(mockEndpoint)).toEqual('');
+
+        process.env['CPI_BASE_URL'] = currentBaseUrl;
     });
 });
+

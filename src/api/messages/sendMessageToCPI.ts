@@ -14,6 +14,10 @@ export const sendRequestToCPI = async (
     logInfo(body);
     logInfo(headers);
 
+    if (!process.env["CPI_BASE_URL"]) {
+        throw new Error("CPI_BASE_URL environment variable is not defined");
+    }
+
     const authHeader = (await getOAuthTokenCPI()).http_header;
 
     const reqHeaders = {

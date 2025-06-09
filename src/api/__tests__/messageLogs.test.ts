@@ -9,7 +9,7 @@ import { getAllIflowsByPackage, deployIflow } from "../iflow/index"; // Need to 
 import { waitAndGetDeployStatus, getDeploymentErrorReason } from "../deployment"; // Need deployment status check
 import dotenv from 'dotenv';
 import moment from 'moment';
-import { deletePackage } from "./helpers";
+import { deletePackage, safeStringify } from "./helpers";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -38,7 +38,10 @@ describe("Message Log API", () => {
             packageCreated = true;
             console.log(`Test package ${testPackageId} created successfully.`);
         } catch (error) {
-            console.error(`Failed to create test package ${testPackageId}. Message Log tests will likely fail. Error:`, error);
+            console.error(
+                `Failed to create test package ${testPackageId}. Message Log tests will likely fail. Error:`,
+                safeStringify(error)
+            );
             throw new Error(`Failed to create prerequisite package ${testPackageId}`);
         }
     });
@@ -68,13 +71,16 @@ describe("Message Log API", () => {
              console.log(`IFlow ${testIflowId} deployed successfully.`);
 
         } catch (error) {
-            console.error(`Error during createMappingTestIflow test for package ${testPackageId}:`, error);
+            console.error(
+                `Error during createMappingTestIflow test for package ${testPackageId}:`,
+                safeStringify(error)
+            );
             // Attempt to get error reason if deployment might have failed
             try {
                  const errorReason = await getDeploymentErrorReason(testIflowId);
                  console.error(`Deployment error reason for ${testIflowId}: ${errorReason}`);
              } catch (reasonError) {}
-            throw error;
+            throw new Error((error as Error).message);
         }
     });
 
@@ -93,8 +99,11 @@ describe("Message Log API", () => {
             expect(count).toBeGreaterThanOrEqual(0); // Count can be 0
             console.log(`Found ${count} messages in the last 5 minutes.`);
         } catch (error) {
-            console.error(`Error during getMessagesCount test:`, error);
-            throw error;
+            console.error(
+                `Error during getMessagesCount test:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -120,8 +129,11 @@ describe("Message Log API", () => {
                 // Check structure of retrieved messages if needed
             }
         } catch (error) {
-            console.error(`Error during getMessages test:`, error);
-            throw error;
+            console.error(
+                `Error during getMessages test:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -147,8 +159,11 @@ describe("Message Log API", () => {
             console.log(`Successfully retrieved error message log ${messageGuid}. Status: ${message.status}`);
 
         } catch (error) {
-            console.error(`Error during getMessages test for specific GUID ${messageGuid}:`, error);
-            throw error;
+            console.error(
+                `Error during getMessages test for specific GUID ${messageGuid}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -196,8 +211,11 @@ describe("Message Log API", () => {
             console.log(`Successfully retrieved error message log ${messageGuid} with attachments. Status: ${message.status}`);
 
         } catch (error) {
-            console.error(`Error during getMessages test for specific GUID ${messageGuid} with attachments:`, error);
-            throw error;
+            console.error(
+                `Error during getMessages test for specific GUID ${messageGuid} with attachments:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 

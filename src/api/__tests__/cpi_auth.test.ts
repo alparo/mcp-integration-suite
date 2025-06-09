@@ -1,5 +1,6 @@
 import { getOAuthTokenCPI } from "../cpi_auth";
 import dotenv from 'dotenv';
+import { safeStringify } from "./helpers";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -40,8 +41,11 @@ describe("CPI Authentication API", () => {
 
         } catch (error) {
             // Log the error for debugging but fail the test
-            console.error("Error during getOAuthTokenCPI test:", error);
-            throw error; // Re-throw to fail the test
+            console.error(
+                "Error during getOAuthTokenCPI test:",
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message); // Re-throw to fail the test
         }
     });
 });

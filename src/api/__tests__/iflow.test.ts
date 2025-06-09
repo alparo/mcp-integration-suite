@@ -15,7 +15,7 @@ import { getiFlowToImage } from '../iflow/diagram'; // Import the diagram functi
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs/promises';
-import { deletePackage } from "./helpers";
+import { deletePackage, safeStringify } from "./helpers";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -44,7 +44,10 @@ describe("IFlow Management API", () => {
             packageCreated = true;
             console.log(`Test package ${testPackageId} created successfully.`);
         } catch (error) {
-            console.error(`Failed to create test package ${testPackageId}. IFlow tests will likely fail. Error:`, error);
+            console.error(
+                `Failed to create test package ${testPackageId}. IFlow tests will likely fail. Error:`,
+                safeStringify(error)
+            );
             // Throwing error here as subsequent tests depend heavily on the package
             throw new Error(`Failed to create prerequisite package ${testPackageId}`);
         }
@@ -62,8 +65,11 @@ describe("IFlow Management API", () => {
             const found = iflows.some((iflow: any) => iflow.Id === testIflowId);
             expect(found).toBe(true);
         } catch (error) {
-            console.error(`Error during createIflow test for ${testIflowId} in package ${testPackageId}:`, error);
-            throw error;
+            console.error(
+                `Error during createIflow test for ${testIflowId} in package ${testPackageId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -78,8 +84,11 @@ describe("IFlow Management API", () => {
             const found = iflows.some((iflow: any) => iflow.Id === testIflowId);
             expect(found).toBe(true);
         } catch (error) {
-            console.error(`Error during getAllIflowsByPackage test for package ${testPackageId}:`, error);
-            throw error;
+            console.error(
+                `Error during getAllIflowsByPackage test for package ${testPackageId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -96,8 +105,11 @@ describe("IFlow Management API", () => {
             // Optionally check for expected files within the downloaded structure (e.g., META-INF)
             await fs.access(path.join(iflowPath, 'META-INF', 'MANIFEST.MF'));
         } catch (error) {
-            console.error(`Error during getIflowFolder test for ${testIflowId}:`, error);
-            throw error;
+            console.error(
+                `Error during getIflowFolder test for ${testIflowId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         } finally {
             // Clean up the downloaded folder
             if (iflowPath) {
@@ -133,13 +145,16 @@ describe("IFlow Management API", () => {
              await fs.rm(iflowPath, { recursive: true, force: true });
 
         } catch (error) {
-            console.error(`Error during updateIflow test for ${testIflowId}:`, error);
+            console.error(
+                `Error during updateIflow test for ${testIflowId}:`,
+                safeStringify(error)
+            );
              // Clean up potentially downloaded folder on error
              try {
                  const iflowPath = path.join(process.cwd(), 'temp', testIflowId); // Assuming temp folder structure
                  await fs.rm(iflowPath, { recursive: true, force: true });
              } catch (cleanupError) {}
-            throw error;
+            throw new Error((error as Error).message);
         }
     });
 
@@ -166,7 +181,10 @@ describe("IFlow Management API", () => {
             iflowDeployed = true;
 
         } catch (error) {
-            console.error(`Error during deployIflow/waitAndGetDeployStatus test for ${testIflowId}:`, error);
+            console.error(
+                `Error during deployIflow/waitAndGetDeployStatus test for ${testIflowId}:`,
+                safeStringify(error)
+            );
             // Attempt to get error reason even if wait failed
              try {
                  const errorReason = await getDeploymentErrorReason(testIflowId);
@@ -174,7 +192,7 @@ describe("IFlow Management API", () => {
              } catch (reasonError) {
                  console.error("Could not retrieve deployment error reason.", reasonError);
              }
-            throw error;
+            throw new Error((error as Error).message);
         }
     });
 
@@ -192,8 +210,11 @@ describe("IFlow Management API", () => {
             console.log(`Endpoints found for ${testIflowId}:`, JSON.stringify(endpoints, null, 2));
             // Add more specific checks if endpoints are expected for the base iflow
         } catch (error) {
-            console.error(`Error during getEndpoints test for ${testIflowId}:`, error);
-            throw error;
+            console.error(
+                `Error during getEndpoints test for ${testIflowId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -206,8 +227,11 @@ describe("IFlow Management API", () => {
              // Allow for 0 or more configurations, as default might exist
              expect(config.length).toBeGreaterThanOrEqual(0); // Re-applying this assertion
          } catch (error) {
-             console.error(`Error during getIflowConfiguration test for ${testIflowId}:`, error);
-             throw error;
+             console.error(
+                 `Error during getIflowConfiguration test for ${testIflowId}:`,
+                 safeStringify(error)
+             );
+             throw new Error((error as Error).message);
          }
      });
 
@@ -219,11 +243,14 @@ describe("IFlow Management API", () => {
              await saveAsNewVersion(testIflowId);
              // Verification would ideally involve getting the iflow details again and checking the version,
              // but the getIflow function isn't available directly here. We assume success if no error.
-         } catch (error) {
-             console.error(`Error during saveAsNewVersion test for ${testIflowId}:`, error);
-             throw error;
-         }
-     });
+        } catch (error) {
+            console.error(
+                `Error during saveAsNewVersion test for ${testIflowId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
+        }
+    });
 
      it("should get the iflow content as a string", async () => {
          expect(iflowCreated).toBe(true);
@@ -236,11 +263,14 @@ describe("IFlow Management API", () => {
              expect(contentString).toContain("// Test Groovy Script Content");
              expect(contentString).toContain("testScript.groovy");
              expect(contentString).toContain("MANIFEST.MF"); // From the base structure
-         } catch (error) {
-             console.error(`Error during getIflowContentString test for ${testIflowId}:`, error);
-             throw error;
-         }
-     });
+        } catch (error) {
+            console.error(
+                `Error during getIflowContentString test for ${testIflowId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
+        }
+    });
 
      it("should generate a diagram image for a specific iflow (if_simple_http_cld)", async () => {
         const targetIflowId = "if_simple_http_cld"; // The iFlow specified by the user
@@ -268,12 +298,18 @@ describe("IFlow Management API", () => {
                  // For now, just log and let it pass if the error is 'not found'.
                  // If it's another error, re-throw it.
                  if (!error.message.includes("Could not find")) {
-                    console.error(`Error during getiFlowToImage test for ${targetIflowId}:`, error);
-                    throw error;
+                    console.error(
+                        `Error during getiFlowToImage test for ${targetIflowId}:`,
+                        safeStringify(error)
+                    );
+                    throw new Error((error as Error).message);
                  }
             } else {
-                console.error(`Error during getiFlowToImage test for ${targetIflowId}:`, error);
-                throw error;
+                console.error(
+                    `Error during getiFlowToImage test for ${targetIflowId}:`,
+                    safeStringify(error)
+                );
+                throw new Error((error as Error).message);
             }
         } finally {
             // Clean up the downloaded folder regardless of success or failure

@@ -1,6 +1,7 @@
 import { sendRequestToCPI } from "../messages/sendMessageToCPI";
 import { getEndpoints } from "../iflow/index"; // To potentially find a real endpoint
 import dotenv from 'dotenv';
+import { safeStringify } from "./helpers";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -54,8 +55,11 @@ describe("Send Message to CPI API", () => {
             console.log(`sendRequestToCPI to ${testPath} completed with status: ${result.status}`);
 
         } catch (error) {
-            console.error(`Error during sendRequestToCPI test to ${testPath}:`, error);
-            throw error;
+            console.error(
+                `Error during sendRequestToCPI test to ${testPath}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -85,8 +89,11 @@ describe("Send Message to CPI API", () => {
             console.log(`sendRequestToCPI (POST) to ${testPath} completed with status: ${result.status}`);
 
         } catch (error) {
-            console.error(`Error during sendRequestToCPI (POST) test to ${testPath}:`, error);
-            throw error;
+            console.error(
+                `Error during sendRequestToCPI (POST) test to ${testPath}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -151,8 +158,11 @@ describe("Send Message to CPI API", () => {
             console.log(`sendRequestToCPI (POST) to ${echoEndpointPath} completed with status: ${result.status}`);
 
         } catch (error) {
-            console.error(`Error during sendRequestToCPI (POST) test to ${echoEndpointPath}:`, error);
-            throw error;
+            console.error(
+                `Error during sendRequestToCPI (POST) test to ${echoEndpointPath}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 

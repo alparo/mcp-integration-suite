@@ -272,8 +272,8 @@ describe("IFlow Management API", () => {
         }
     });
 
-     it("should generate a diagram image for a specific iflow (if_simple_http_cld)", async () => {
-        const targetIflowId = "if_simple_http_cld"; // The iFlow specified by the user
+     it("should generate a diagram image for the created iflow", async () => {
+        const targetIflowId = testIflowId; // Use the iflow created earlier
         let iflowPath: string | undefined;
         try {
             console.log(`Attempting to download folder for diagram test: ${targetIflowId}`);

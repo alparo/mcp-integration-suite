@@ -69,6 +69,17 @@ describe("Send Message to CPI API", () => {
         }
     });
 
+    it('should throw an error if CPI_BASE_URL is not defined', async () => {
+        const currentBaseUrl = process.env.CPI_BASE_URL;
+        delete process.env.CPI_BASE_URL;
+
+        await expect(sendRequestToCPI('/http/test', 'GET', 'application/json')).rejects.toThrow(
+            'CPI_BASE_URL environment variable is not defined'
+        );
+
+        process.env.CPI_BASE_URL = currentBaseUrl;
+    });
+
     // Add a test that tries to hit a potentially real endpoint (if if_echo_mapping was deployed)
     // This is less reliable as it depends on previous test suites' success
     // Skipping due to flakiness
@@ -125,3 +136,4 @@ describe("Send Message to CPI API", () => {
     });
 
 });
+

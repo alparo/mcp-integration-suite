@@ -42,6 +42,10 @@ export const getEndpointUrl = (endpoint: ServiceEndpoints): string => {
         return '';
     }
 
-    // for now only supports https:// 
+    // for now only supports https://
+    if (!process.env['CPI_BASE_URL']) {
+        return '';
+    }
     return `${process.env['CPI_BASE_URL']}${protocolObj.URIProtocol}${endpointIdentifier}`;
 }
+

@@ -8,7 +8,7 @@ NodeJs and NPM (Node Version > 20 because of native NodeJS fetch)
 
 ## Installation
 ```sh
-git clone https://github.com/1nbuc/mcp-integration-suite.git
+git clone https://github.com/alparo/mcp-integration-suite.git
 cd mcp-integration-suite
 npm install
 npm run build

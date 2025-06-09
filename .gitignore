@@ -9,3 +9,4 @@ temp
 src/generated/**
 errorlog.txt
 coverage
+.clinerules/mcpRules.json

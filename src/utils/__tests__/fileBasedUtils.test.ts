@@ -132,11 +132,7 @@ describe('File Based Utility Functions', () => {
 
             // Verify appended content
             const finalRead = await fs.readFile(path.join(tempBaseDir, filePath), 'utf-8');
-            // Note: The current implementation of patchFile overwrites even in append mode due to writeFile running after appendFile.
-            // This test will likely fail unless the implementation is fixed.
-            // Let's expect the overwritten content for now, reflecting the current code behavior.
-            expect(finalRead).toEqual(appendedContent);
-            // If fixed, the expectation should be: expect(finalRead).toEqual(expectedContent);
+            expect(finalRead).toEqual(expectedContent);
         });
 
          it('should create and append to a new file if append mode is true and file does not exist', async () => {
@@ -149,11 +145,7 @@ describe('File Based Utility Functions', () => {
             await expect(fs.access(fullPath)).resolves.not.toThrow(); // Ensure exists
 
             const actualContent = await fs.readFile(fullPath, 'utf-8');
-             // Note: The current implementation of patchFile overwrites even in append mode.
-             // This test will likely fail unless the implementation is fixed.
-             // Expecting overwritten content based on current code.
             expect(actualContent).toEqual(content);
-             // If fixed, the expectation should be: expect(actualContent).toEqual(content);
         });
     });
 });

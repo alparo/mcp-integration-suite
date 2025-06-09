@@ -87,8 +87,8 @@ const isBasicCredPresent = () => process.env.API_USER && process.env.API_PASS ? 
  * Get the API Destination based on .env file
  * @returns
  */
-export const getCurrentDestionation =
-	async (): Promise<HttpDestinationOrFetchOptions> => {
+export const getCurrentDestination =
+        async (): Promise<HttpDestinationOrFetchOptions> => {
 		if (!process.env.API_BASE_URL) {
 			throw new Error("No API Url provided in project .env file");
 		}

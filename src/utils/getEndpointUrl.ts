@@ -4,20 +4,16 @@ import { ServiceEndpoints } from "../generated/IntegrationContent";
 /**
  * Translate internal CPI Protocol names
  */
-const cpiProtocolMap: { [protocol: string]: { trailingProtocol: string, URIProtocol: string } } = {
+const cpiProtocolMap: { [protocol: string]: { URIProtocol: string } } = {
     "REST": {
-        trailingProtocol: 'https',
         URIProtocol: '/http/',
     },
     "AS2": {
-        trailingProtocol: 'https',
         URIProtocol: '/as2/as2/'
     },
     "SOAP": {
-        trailingProtocol: 'https',
         URIProtocol: '/cfx/soapapi/'
     }
-
 };
 
 /**

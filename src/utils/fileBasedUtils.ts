@@ -42,11 +42,12 @@ export const patchFile = async (
 ): Promise<void> => {
 	const filePath = path.join(basePath, relativePath);
 
-	if (append) {
-		await appendFile(filePath, content);
-	}
+        await mkdir(path.dirname(filePath), { recursive: true });
 
-	await mkdir(path.dirname(filePath), { recursive: true });
-	await writeFile(filePath, content);
-	return;
+        if (append) {
+                await appendFile(filePath, content);
+        } else {
+                await writeFile(filePath, content);
+        }
+        return;
 };

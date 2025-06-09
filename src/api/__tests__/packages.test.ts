@@ -4,7 +4,7 @@ import { createPackage, getPackage, getPackages } from "../packages/index";
 import { integrationContent, IntegrationPackages } from "../../generated/IntegrationContent/index";
 import dotenv from 'dotenv';
 import { getCurrentDestination } from "../api_destination";
-import { deletePackage } from "./helpers";
+import { deletePackage, safeStringify } from "./helpers";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -32,7 +32,10 @@ describe("Package Management API", () => {
             packageCreated = true;
             console.log(`Test package ${testPackageId} created successfully.`);
         } catch (error) {
-            console.error(`Failed to create test package ${testPackageId}. Some tests might fail or be skipped. Error:`, error);
+            console.error(
+                `Failed to create test package ${testPackageId}. Some tests might fail or be skipped. Error:`,
+                safeStringify(error)
+            );
             // Decide if tests should proceed without the package
             // For now, we'll let them run and potentially fail if they depend on the created package.
         }
@@ -60,8 +63,11 @@ describe("Package Management API", () => {
                 expect(found).toBe(true);
             }
         } catch (error) {
-            console.error("Error during getPackages test:", error);
-            throw error;
+            console.error(
+                "Error during getPackages test:",
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 
@@ -77,8 +83,11 @@ describe("Package Management API", () => {
             expect(pkg.name).toEqual(`Jest Test Package`);
             // Add more assertions based on expected package structure if needed
         } catch (error) {
-            console.error(`Error during getPackage test for ID ${testPackageId}:`, error);
-            throw error;
+            console.error(
+                `Error during getPackage test for ID ${testPackageId}:`,
+                safeStringify(error)
+            );
+            throw new Error((error as Error).message);
         }
     });
 

@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { getOAuthToken, getCurrentDestination } from "../api_destination";
+import { safeStringify } from "./helpers";
 import path from "path";
 import { projPath } from "../..";
 
@@ -40,8 +41,11 @@ describe("API Destination Handling", () => {
                 expect(cachedToken.value).toEqual(token.value);
 
             } catch (error) {
-                console.error("Error during getOAuthToken (Management API) test:", error);
-                throw error;
+                console.error(
+                    "Error during getOAuthToken (Management API) test:",
+                    safeStringify(error)
+                );
+                throw new Error((error as Error).message);
             }
         });
 
@@ -114,8 +118,11 @@ describe("API Destination Handling", () => {
                 expect(destination.authTokens![0].expiresIn).toBeDefined();
                 expect(destination.authTokens![0].http_header).toBeDefined();
             } catch (error) {
-                console.error("Error during getCurrentDestination (OAuth) test:", error);
-                throw error;
+                console.error(
+                    "Error during getCurrentDestination (OAuth) test:",
+                    safeStringify(error)
+                );
+                throw new Error((error as Error).message);
             }
         });
 
@@ -135,8 +142,11 @@ describe("API Destination Handling", () => {
                 expect(destination.username).toEqual(process.env.API_USER);
                 expect(destination.password).toEqual(process.env.API_PASS);
             } catch (error) {
-                console.error("Error during getCurrentDestination (Basic) test:", error);
-                throw error;
+                console.error(
+                    "Error during getCurrentDestination (Basic) test:",
+                    safeStringify(error)
+                );
+                throw new Error((error as Error).message);
             }
         });
     });

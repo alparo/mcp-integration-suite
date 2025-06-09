@@ -112,12 +112,13 @@ Some ressources might relay on other package artefacts which are not included bu
 You only have to provide files that need to be updated but allways send the full file
 
 If you encounter prolems updating/deploying iflows consider taking a look at the available templates where you can learn from
-Templates for complex iflows and message mappings are avialagle
+Templates for complex iflows and message mappings are available
 
 Iflows can contain message mappings, datatypes (XSDs) and scripts
 Message mappings can also be standalone objects, but most of the time will be featured within an iflow
 
 Make sure you ONLY change the things the user instructs you to and keep all other things
+Always use full xml structure, don't use contractions
 Folder structure is like this:
 src/main/resources/ is the root
 src/main/resources/mapping contains message mappings in format <mappingname>.mmap with xml structure
